@@ -282,6 +282,16 @@ module.exports = (app) => {
   let sumTotalesGAsuncionAS = 0;
   let sumTotalesGAsuncionPR = 0;
 
+  // Sub Totales Zona Ruta 2
+  let sumTotalesR2CS = 0;
+  let sumTotalesR2TT = 0;
+  let sumTotalesR2CO = 0;
+  let sumTotalesR2VN = 0;
+  let sumTotalesR2MT = 0;
+  let sumTotalesR2AG = 0;
+  let sumTotalesR2AS = 0;
+  let sumTotalesR2PR = 0;
+
   function iniciarEnvio() {
     setTimeout(() => {
       // Datos de las cantidades de los turnos
@@ -358,6 +368,7 @@ module.exports = (app) => {
   function sumarMontos(los_reportes) {
     let arrayAsuncion = ['MARISCAL LOPEZ', 'AVENIDA QUINTA', 'VILLA MORRA', 'ARTIGAS', 'LUISITO', 'PALMA'];
     let arrayGAsuncion = ['LAMBARE', 'CATEDRAL', 'LUQUE', 'LA RURAL', 'ÑEMBY', 'ITAUGUA', '1811 SUCURSAL', 'KM 14 Y MEDIO', 'CAPIATA'];
+    let arrayRuta2 = ['CAACUPE', 'CORONEL OVIEDO'];
     //console.log('DESDE SUMAR MONTOS', los_reportes.length);
 
     for(let r of los_reportes) {
@@ -377,6 +388,14 @@ module.exports = (app) => {
         sumTotalesGAsuncionVN += parseInt(r.VENTA_NUEVA); 
         sumTotalesGAsuncionMT += parseInt(r.MONTO_TOTAL); 
       }
+
+      if(arrayRuta2.includes(r.SUCURSAL)) {
+        sumTotalesR2CS += parseInt(r.CUOTA_SOCIAL); 
+        sumTotalesR2TT += parseInt(r.TRATAMIENTO); 
+        sumTotalesR2CO += parseInt(r.COBRADOR); 
+        sumTotalesR2VN += parseInt(r.VENTA_NUEVA); 
+        sumTotalesR2MT += parseInt(r.MONTO_TOTAL); 
+      }
     }
 
     // Suma las cantidades de los turnos
@@ -391,6 +410,12 @@ module.exports = (app) => {
         sumTotalesGAsuncionAG += parseInt(t.AGENDADOS); 
         sumTotalesGAsuncionAS += parseInt(t.ASISTIDOS); 
         sumTotalesGAsuncionPR += parseInt(t.PROFESIONAL); 
+      }
+
+      if (arrayRuta2.includes(t.SUCURSAL)) {
+        sumTotalesR2AG += parseInt(t.AGENDADOS); 
+        sumTotalesR2AS += parseInt(t.ASISTIDOS); 
+        sumTotalesR2PR += parseInt(t.PROFESIONAL); 
       }
     }
 
@@ -422,6 +447,8 @@ module.exports = (app) => {
       let ejeXasistido = 1160;
       let ejeXprofesional = 1260;
 
+      /** */
+
       // Eje Y de cada fila
       let ejeYml = 150;
       let ejeYaq = 170;
@@ -443,6 +470,11 @@ module.exports = (app) => {
       let ejeYcap = 450;
 
       let ejeYtotalesGranAsu = 470;
+
+      let ejeYcaac = 490;
+      let ejeYcoro = 510;
+
+      let ejeYtotalesRuta2 = 530;
 
 
       for (let r of losReportesFormateado) {
@@ -1362,6 +1394,129 @@ module.exports = (app) => {
           context.textAlign = "center";
           context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcap);
         }
+
+        // Zona Ruta 2
+        if (r.SUCURSAL == "CAACUPE") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYcaac);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYcaac);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYcaac);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYcaac);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcaac);
+        }
+
+        if (r.SUCURSAL == "CORONEL OVIEDO") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYcoro);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYcoro);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYcoro);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYcoro);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcoro);
+        }
       }
 
       // Fila totales ZONA ASUNCION
@@ -1509,6 +1664,78 @@ module.exports = (app) => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }), ejeXprofesional, ejeYtotalesGranAsu);
+
+      // SUM - Monto Total ZONA RUTA 2
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText('ZONA RUTA 2', ejeXsucu, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesR2CS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcuota, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesR2TT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXtrata, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesR2CO.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcobra, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesR2VN.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXventa, ejeYtotalesRuta2);
+
+      // MONTO TOTAL
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesR2MT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXmonto, ejeYtotalesRuta2);
+
+      // AGENDADOS
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesR2AG.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXagendado, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesR2AS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXasistido, ejeYtotalesRuta2);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesR2PR.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXprofesional, ejeYtotalesRuta2);
 
 
 
