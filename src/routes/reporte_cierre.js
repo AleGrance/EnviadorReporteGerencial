@@ -23,7 +23,7 @@ odontos.blobAsText = false;
 
 // Dimensiones del ticket
 const width = 1480;
-const height = 800;
+const height = 850;
 
 // Instantiate the canvas object
 const canvas = createCanvas(width, height);
@@ -55,37 +55,37 @@ let numerosDestinatarios = [
   {NOMBRE: 'Ale Corpo', NUMERO: '595974107341'},
   {NOMBRE: 'José Aquino', NUMERO: '595985604619'},
   {NOMBRE: 'Alejandro Grance', NUMERO: '595986153301'},
-  {NOMBRE: 'Christell Villalba', NUMERO: '595982155232'},
+  {NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933'},
   ]
 
-let todasSucursales = [
-    "1811 SUCURSAL",
-    "ADMINISTRACION",
-    "ARTIGAS",
-    "AVENIDA QUINTA",
-    "AYOLAS",
-    "CAACUPE",
-    "CAMPO 9",
-    "CAPIATA",
-    "CATEDRAL",
-    "CORONEL OVIEDO",
-    "ENCARNACION CENTRO",
-    "HOHENAU",
-    "ITAUGUA",
-    "KM 14 Y MEDIO",
-    "KM 7",
-    "LA RURAL",
-    "LAMBARE",
-    "LUISITO",
-    "LUQUE",
-    "MARIA AUXILIADORA",
-    "MARISCAL LOPEZ",
-    "PALMA",
-    "SANTA RITA",
-    "VILLA MORRA",
-    "ÑEMBY",
-    "SUC. SANTANI",
-  ];
+// let todasSucursales = [
+//     "1811 SUCURSAL",
+//     "ADMINISTRACION",
+//     "ARTIGAS",
+//     "AVENIDA QUINTA",
+//     "AYOLAS",
+//     "CAACUPE",
+//     "CAMPO 9",
+//     "CAPIATA",
+//     "CATEDRAL",
+//     "CORONEL OVIEDO",
+//     "ENCARNACION CENTRO",
+//     "HOHENAU",
+//     "ITAUGUA",
+//     "KM 14 Y MEDIO",
+//     "KM 7",
+//     "LA RURAL",
+//     "LAMBARE",
+//     "LUISITO",
+//     "LUQUE",
+//     "MARIA AUXILIADORA",
+//     "MARISCAL LOPEZ",
+//     "PALMA",
+//     "SANTA RITA",
+//     "VILLA MORRA",
+//     "ÑEMBY",
+//     "SUC. SANTANI",
+//   ];
 
 let todasSucursalesActivas = [];
 
@@ -95,7 +95,7 @@ module.exports = (app) => {
   const Users = app.db.models.Users;
 
   // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
-  cron.schedule("17 10 * * 1-6", () => {
+  cron.schedule("45 12 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
@@ -129,7 +129,7 @@ module.exports = (app) => {
 
           todasSucursalesActivas = nuevoArray;
 
-          console.log("sucursales activas", todasSucursalesActivas);
+          //console.log("sucursales activas", todasSucursalesActivas);
           // IMPORTANTE: cerrar la conexion
           db.detach();
         }
@@ -232,7 +232,7 @@ module.exports = (app) => {
     });
   }
 
-  injeccionFirebirdCierre();
+  //injeccionFirebirdCierre();
 
   // Trae las cantidades de los turnos del JKMT al PGSQL
   function injeccionFirebirdTurnos() {
@@ -511,11 +511,13 @@ module.exports = (app) => {
     }, tiempoRetrasoPGSQL);
   }
 
-  //iniciarEnvio();
+  iniciarEnvio();
 
   function sumarMontos(los_reportes) {
     let arrayAsuncion = [
+      "ADMINISTRACION",
       "MARISCAL LOPEZ",
+      "MCAL. LOPEZ URGENCIAS",
       "AVENIDA QUINTA",
       "VILLA MORRA",
       "ARTIGAS",
@@ -715,54 +717,117 @@ module.exports = (app) => {
       /** */
 
       // Eje Y de cada fila
-      let ejeYml = 150;
-      let ejeYaq = 170;
-      let ejeYvm = 190;
-      let ejeYar = 210;
-      let ejeYlu = 230;
-      let ejeYpa = 250;
+      let ejeYadm = 150;
+      let ejeYml = 170;
+      let ejeYmlurg = 190;
+      let ejeYaq = 210;
+      let ejeYvm = 230;
+      let ejeYar = 250;
+      let ejeYlu = 270;
+      let ejeYpa = 290;
 
-      let ejeYtotalesAsu = 270;
+      let ejeYtotalesAsu = 310;
 
-      let ejeYlam = 290;
-      let ejeYcat = 310;
-      let ejeYluq = 330;
-      let ejeYlar = 350;
-      let ejeYnem = 370;
-      let ejeYita = 390;
-      let ejeY1811 = 410;
-      let ejeYkm14 = 430;
-      let ejeYcap = 450;
+      let ejeYlam = 330;
+      let ejeYcat = 350;
+      let ejeYluq = 370;
+      let ejeYlar = 390;
+      let ejeYnem = 410;
+      let ejeYita = 430;
+      let ejeY1811 = 450;
+      let ejeYkm14 = 470;
+      let ejeYcap = 490;
 
-      let ejeYtotalesGranAsu = 470;
+      let ejeYtotalesGranAsu = 510;
 
-      let ejeYcaac = 490;
-      let ejeYcoro = 510;
+      let ejeYcaac = 530;
+      let ejeYcoro = 550;
 
-      let ejeYtotalesRuta2 = 530;
+      let ejeYtotalesRuta2 = 570;
 
-      let ejeYhohe = 550;
-      let ejeYencar = 570;
-      let ejeYmaria = 590;
-      let ejeYayo = 610;
+      let ejeYhohe = 590;
+      let ejeYencar = 610;
+      let ejeYmaria = 630;
+      let ejeYayo = 650;
 
-      let ejeYtotalesItapua = 630;
+      let ejeYtotalesItapua = 670;
 
-      let ejeYkm7 = 650;
-      let ejeYsanta = 670;
-      let ejeYcampo = 690;
+      let ejeYkm7 = 690;
+      let ejeYsanta = 710;
+      let ejeYcampo = 730;
 
-      let ejeYtotalesAltoP = 710;
+      let ejeYtotalesAltoP = 750;
 
-      let ejeYsantani = 730;
+      let ejeYsantani = 770;
 
-      let ejeYtotalesSanPe = 750;
+      let ejeYtotalesSanPe = 790;
 
       // Eje Y Total General
-      let ejeYTotalGeneral = 770;
+      let ejeYTotalGeneral = 820;
 
       for (let r of losReportesFormateado) {
         // Zona ASU
+        if (r.SUCURSAL == "ADMINISTRACION") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYadm);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYadm);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYadm);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYadm);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYadm);
+        }
+
         if (r.SUCURSAL == "MARISCAL LOPEZ") {
           // Busca los turnos por sucursal y los dibuja en el canva
           for (let t of losTurnosCantidades) {
@@ -822,6 +887,67 @@ module.exports = (app) => {
           context.fillStyle = "#34495E";
           context.textAlign = "center";
           context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYml);
+        }
+
+        if (r.SUCURSAL == "MCAL. LOPEZ URGENCIAS") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYmlurg);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYmlurg);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYmlurg);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYmlurg);
+
+          context.font = "bold 13px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYmlurg);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYmlurg);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYmlurg);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYmlurg);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYmlurg);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYmlurg);
         }
 
         if (r.SUCURSAL == "AVENIDA QUINTA") {
@@ -2819,7 +2945,7 @@ module.exports = (app) => {
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText("ZONA ALTO PARANA", ejeXsucu, ejeYtotalesSanPe);
+      context.fillText("ZONA SAN PEDRO", ejeXsucu, ejeYtotalesSanPe);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
@@ -3037,7 +3163,7 @@ module.exports = (app) => {
       for (let n of numerosDestinatarios) {
         console.log(n);
         mensajeBody = {
-          message: "Buenas, " + n.NOMBRE + " se envia el reporte.",
+          message: "Buenas tardes, se envia el reporte de cierre diario.",
           phone: n.NUMERO,
           mimeType: fileMimeTypeMedia,
           data: fileBase64Media,
@@ -3046,69 +3172,69 @@ module.exports = (app) => {
         };
       
       // Funcion ajax para nodejs que realiza los envios a la API free WWA
-      // axios
-      //   .post(wwaUrl, mensajeBody)
-      //   .then((response) => {
-      //     const data = response.data;
+      axios
+        .post(wwaUrl, mensajeBody)
+        .then((response) => {
+          const data = response.data;
 
-      //     if (data.responseExSave.id) {
-      //       console.log("Enviado - OK");
-      //       // Se actualiza el estado a 1
-      //       const body = {
-      //         estado_envio: 1,
-      //       };
+          if (data.responseExSave.id) {
+            console.log("Enviado - OK");
+            // Se actualiza el estado a 1
+            const body = {
+              estado_envio: 1,
+            };
 
-      //       // Tickets.update(body, {
-      //       //   where: { id_turno: turnoId },
-      //       // })
-      //       //   //.then((result) => res.json(result))
-      //       //   .catch((error) => {
-      //       //     res.status(412).json({
-      //       //       msg: error.message,
-      //       //     });
-      //       //   });
-      //     }
+            // Tickets.update(body, {
+            //   where: { id_turno: turnoId },
+            // })
+            //   //.then((result) => res.json(result))
+            //   .catch((error) => {
+            //     res.status(412).json({
+            //       msg: error.message,
+            //     });
+            //   });
+          }
 
-      //     if (data.responseExSave.unknow) {
-      //       console.log("No Enviado - unknow");
-      //       // Se actualiza el estado a 3
-      //       const body = {
-      //         estado_envio: 3,
-      //       };
+          if (data.responseExSave.unknow) {
+            console.log("No Enviado - unknow");
+            // Se actualiza el estado a 3
+            const body = {
+              estado_envio: 3,
+            };
 
-      //       // Tickets.update(body, {
-      //       //   where: { id_turno: turnoId },
-      //       // })
-      //       //   //.then((result) => res.json(result))
-      //       //   .catch((error) => {
-      //       //     res.status(412).json({
-      //       //       msg: error.message,
-      //       //     });
-      //       //   });
-      //     }
+            // Tickets.update(body, {
+            //   where: { id_turno: turnoId },
+            // })
+            //   //.then((result) => res.json(result))
+            //   .catch((error) => {
+            //     res.status(412).json({
+            //       msg: error.message,
+            //     });
+            //   });
+          }
 
-      //     if (data.responseExSave.error) {
-      //       console.log("No enviado - error");
-      //       const errMsg = data.responseExSave.error.slice(0, 17);
-      //       if (errMsg === "Escanee el código") {
-      //         //updateEstatusERROR(turnoId, 104);
-      //         console.log("Error 104: ", data.responseExSave.error);
-      //       }
-      //       // Sesion cerrada o desvinculada. Puede que se envie al abrir la sesion o al vincular
-      //       if (errMsg === "Protocol error (R") {
-      //         //updateEstatusERROR(turnoId, 105);
-      //         console.log("Error 105: ", data.responseExSave.error);
-      //       }
-      //       // El numero esta mal escrito o supera los 12 caracteres
-      //       if (errMsg === "Evaluation failed") {
-      //         //updateEstatusERROR(turnoId, 106);
-      //         console.log("Error 106: ", data.responseExSave.error);
-      //       }
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error("Ocurrió un error:", error);
-      //   });
+          if (data.responseExSave.error) {
+            console.log("No enviado - error");
+            const errMsg = data.responseExSave.error.slice(0, 17);
+            if (errMsg === "Escanee el código") {
+              //updateEstatusERROR(turnoId, 104);
+              console.log("Error 104: ", data.responseExSave.error);
+            }
+            // Sesion cerrada o desvinculada. Puede que se envie al abrir la sesion o al vincular
+            if (errMsg === "Protocol error (R") {
+              //updateEstatusERROR(turnoId, 105);
+              console.log("Error 105: ", data.responseExSave.error);
+            }
+            // El numero esta mal escrito o supera los 12 caracteres
+            if (errMsg === "Evaluation failed") {
+              //updateEstatusERROR(turnoId, 106);
+              console.log("Error 106: ", data.responseExSave.error);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Ocurrió un error:", error);
+        });
       
         await retraso();
       }

@@ -14,15 +14,15 @@ module.exports = (app) => {
 
 
   // Ejecutar la funcion a las 20:00 de Lunes(1) a Sabados (6)
-  cron.schedule("20 20 * * 1-6", () => {
-    let hoyAhora = new Date();
-    let diaHoy = hoyAhora.toString().slice(0, 3);
-    let fullHoraAhora = hoyAhora.toString().slice(16, 21);
+  // cron.schedule("20 20 * * 1-6", () => {
+  //   let hoyAhora = new Date();
+  //   let diaHoy = hoyAhora.toString().slice(0, 3);
+  //   let fullHoraAhora = hoyAhora.toString().slice(16, 21);
 
-    console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
-    console.log("CRON: Se almacena el historico de los tickets enviados hoy");
-    cantidadEnviados();
-  });
+  //   console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
+  //   console.log("CRON: Se almacena el historico de los tickets enviados hoy");
+  //   cantidadEnviados();
+  // });
 
   async function cantidadEnviados() {
     // Fecha de hoy 2022-02-30
