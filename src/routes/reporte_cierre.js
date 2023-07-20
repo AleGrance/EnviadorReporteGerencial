@@ -22,8 +22,8 @@ odontos.retryConnectionInterval = 1000; // reconnect interval in case of connect
 odontos.blobAsText = false;
 
 // Dimensiones del ticket
-const width = 1920;
-const height = 1080;
+const width = 1480;
+const height = 800;
 
 // Instantiate the canvas object
 const canvas = createCanvas(width, height);
@@ -521,11 +521,11 @@ module.exports = (app) => {
       sumTotalesItaVN +
       sumTotalesApVN;
     totalGenMontoTotal =
-      sumTotalesAsuncionVN +
-      sumTotalesGAsuncionVN +
-      sumTotalesR2VN +
-      sumTotalesItaVN +
-      sumTotalesApVN;
+      sumTotalesAsuncionMT +
+      sumTotalesGAsuncionMT +
+      sumTotalesR2MT +
+      sumTotalesItaMT +
+      sumTotalesApMT;
 
     // Suma las cantidades de los turnos
     for (let t of losTurnosCantidades) {
@@ -648,7 +648,7 @@ module.exports = (app) => {
       let ejeYtotalesAltoP = 710;
 
       // Eje Y Total General
-      let ejeYTotalGeneral = 730;
+      let ejeYTotalGeneral = 750;
 
       for (let r of losReportesFormateado) {
         // Zona ASU
