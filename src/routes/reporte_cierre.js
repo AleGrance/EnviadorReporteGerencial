@@ -55,7 +55,7 @@ module.exports = (app) => {
   const Reporte_turnos = app.db.models.Reporte_turno;
   const Users = app.db.models.Users;
 
-  // Ejecutar la funcion cada 10min de 07:00 a 19:59 de Lunes(1) a Sabados (6)
+  // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
   cron.schedule("00 22 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
@@ -104,7 +104,6 @@ module.exports = (app) => {
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
 
-      // db = DATABASE
       db.query(
         // Trae los ultimos 50 registros de turnos del JKMT
         "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
@@ -198,9 +197,8 @@ module.exports = (app) => {
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
 
-      // db = DATABASE
       db.query(
-        // Trae los ultimos 50 registros de turnos del JKMT
+        // Trae las cantidades de turnos por sucursal del JKMT
         `SELECT
         S.NOMBRE AS SUCURSAL,
         COUNT (T.COD_TURNO) as AGENDADOS,
@@ -214,7 +212,10 @@ module.exports = (app) => {
         GROUP BY S.NOMBRE`,
 
         function (err, result) {
-          console.log("Cant de turnos obtenidos del JKMT:", result.length);
+          console.log(
+            "Cant de registros de turnos por sucursal obtenidos del JKMT:",
+            result.length
+          );
           console.log(fechaHoy);
           console.log(result);
 
@@ -312,21 +313,39 @@ module.exports = (app) => {
   let sumTotalesApAS = 0;
   let sumTotalesApPR = 0;
 
- // Totales Generales 
- let totalGenCuotaSocial = 0;
- let totalGenTratamiento = 0;
- let totalGenCobrador = 0;
- let totalGenVentaNueva = 0;
- let totalGenMontoTotal = 0;
- let totalGenAgendado = 0;
- let totalGenAsistido = 0;
- let totalGenProfesional = 0;
+  // Totales Generales
+  let totalGenCuotaSocial = 0;
+  let totalGenTratamiento = 0;
+  let totalGenCobrador = 0;
+  let totalGenVentaNueva = 0;
+  let totalGenMontoTotal = 0;
+  let totalGenAgendado = 0;
+  let totalGenAsistido = 0;
+  let totalGenProfesional = 0;
 
   function iniciarEnvio() {
+    //let fechaHoy = new Date().toISOString().slice(0, 10);
+    const fechaHoy = new Date();
+    let year = fechaHoy.getFullYear();
+    let month = fechaHoy.getMonth() + 1;
+    let day = fechaHoy.getDate();
+
+    // La fecha filtro para buscar los registros
+    let fechaHoyFiltro = year + '-' + month + '-' + day;
+
+    const opcionesFormato = {
+      day: "2-digit", // Día del mes con dos dígitos (01, 02, 03, etc.)
+      month: "2-digit", // Mes con dos dígitos (01, 02, 03, etc.)
+      year: "numeric", // Año con cuatro dígitos (ejemplo: 2023)
+    };
+
+    // La fecha local para imprimir directamente en el canvas
+    const fechaLocal = fechaHoy.toLocaleDateString(undefined, opcionesFormato);
+
     setTimeout(() => {
       // Datos de las cantidades de los turnos
       Reporte_turnos.findAll({
-        where: { FECHA: "2023-07-19" },
+        where: { FECHA: fechaHoyFiltro },
         //order: [["createdAt", "ASC"]],
       })
         .then((result) => {
@@ -341,19 +360,19 @@ module.exports = (app) => {
 
       // Datos del cierre
       Reporte_cierre.findAll({
-        where: { FECHA: "2023-07-19" },
+        where: { FECHA: fechaHoyFiltro },
         //order: [["createdAt", "ASC"]],
       })
         .then((result) => {
           losReportes = result;
           console.log("Preparando reporte:", losReportes.length);
-          //console.log("Preparando reporte:", losReportes);
 
+          // Funcion que suma los montos totales
           sumarMontos(losReportes);
 
           losReportesFormateado = result.map((objeto) => ({
             ...objeto,
-            FECHA: "19-07-2023",
+            FECHA: fechaLocal,
             SUCURSAL: objeto.SUCURSAL,
             CUOTA_SOCIAL:
               objeto.CUOTA_SOCIAL !== "0"
@@ -477,12 +496,37 @@ module.exports = (app) => {
     }
 
     // Totales Generales - CIERRES DE CAJA
-    totalGenCuotaSocial = sumTotalesAsuncionCS + sumTotalesGAsuncionCS + sumTotalesR2CS + sumTotalesItaCS + sumTotalesApCS;
-    totalGenTratamiento = sumTotalesAsuncionTT + sumTotalesGAsuncionTT + sumTotalesR2TT + sumTotalesItaTT + sumTotalesApTT;
-    totalGenCobrador = sumTotalesAsuncionCO + sumTotalesGAsuncionCO + sumTotalesR2CO + sumTotalesItaCO + sumTotalesApCO;
-    totalGenVentaNueva = sumTotalesAsuncionVN + sumTotalesGAsuncionVN + sumTotalesR2VN + sumTotalesItaVN + sumTotalesApVN;
-    totalGenMontoTotal = sumTotalesAsuncionVN + sumTotalesGAsuncionVN + sumTotalesR2VN + sumTotalesItaVN + sumTotalesApVN;
-    
+    totalGenCuotaSocial =
+      sumTotalesAsuncionCS +
+      sumTotalesGAsuncionCS +
+      sumTotalesR2CS +
+      sumTotalesItaCS +
+      sumTotalesApCS;
+    totalGenTratamiento =
+      sumTotalesAsuncionTT +
+      sumTotalesGAsuncionTT +
+      sumTotalesR2TT +
+      sumTotalesItaTT +
+      sumTotalesApTT;
+    totalGenCobrador =
+      sumTotalesAsuncionCO +
+      sumTotalesGAsuncionCO +
+      sumTotalesR2CO +
+      sumTotalesItaCO +
+      sumTotalesApCO;
+    totalGenVentaNueva =
+      sumTotalesAsuncionVN +
+      sumTotalesGAsuncionVN +
+      sumTotalesR2VN +
+      sumTotalesItaVN +
+      sumTotalesApVN;
+    totalGenMontoTotal =
+      sumTotalesAsuncionVN +
+      sumTotalesGAsuncionVN +
+      sumTotalesR2VN +
+      sumTotalesItaVN +
+      sumTotalesApVN;
+
     // Suma las cantidades de los turnos
     for (let t of losTurnosCantidades) {
       if (arrayAsuncion.includes(t.SUCURSAL)) {
@@ -517,9 +561,24 @@ module.exports = (app) => {
     }
 
     // Totales Generales - CANTIDAD DE TURNOS
-    totalGenAgendado = sumTotalesAsuncionAG + sumTotalesGAsuncionAG + sumTotalesR2AG + sumTotalesItaAG + sumTotalesApAG;
-    totalGenAsistido = sumTotalesAsuncionAS + sumTotalesGAsuncionAS + sumTotalesR2AS + sumTotalesItaAS + sumTotalesApAS;
-    totalGenProfesional = sumTotalesAsuncionPR + sumTotalesGAsuncionPR + sumTotalesR2PR + sumTotalesItaPR + sumTotalesApPR;
+    totalGenAgendado =
+      sumTotalesAsuncionAG +
+      sumTotalesGAsuncionAG +
+      sumTotalesR2AG +
+      sumTotalesItaAG +
+      sumTotalesApAG;
+    totalGenAsistido =
+      sumTotalesAsuncionAS +
+      sumTotalesGAsuncionAS +
+      sumTotalesR2AS +
+      sumTotalesItaAS +
+      sumTotalesApAS;
+    totalGenProfesional =
+      sumTotalesAsuncionPR +
+      sumTotalesGAsuncionPR +
+      sumTotalesR2PR +
+      sumTotalesItaPR +
+      sumTotalesApPR;
   }
 
   // Envia los mensajes
