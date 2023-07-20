@@ -312,6 +312,16 @@ module.exports = (app) => {
   let sumTotalesApAS = 0;
   let sumTotalesApPR = 0;
 
+ // Totales Generales 
+ let totalGenCuotaSocial = 0;
+ let totalGenTratamiento = 0;
+ let totalGenCobrador = 0;
+ let totalGenVentaNueva = 0;
+ let totalGenMontoTotal = 0;
+ let totalGenAgendado = 0;
+ let totalGenAsistido = 0;
+ let totalGenProfesional = 0;
+
   function iniciarEnvio() {
     setTimeout(() => {
       // Datos de las cantidades de los turnos
@@ -466,6 +476,13 @@ module.exports = (app) => {
       }
     }
 
+    // Totales Generales - CIERRES DE CAJA
+    totalGenCuotaSocial = sumTotalesAsuncionCS + sumTotalesGAsuncionCS + sumTotalesR2CS + sumTotalesItaCS + sumTotalesApCS;
+    totalGenTratamiento = sumTotalesAsuncionTT + sumTotalesGAsuncionTT + sumTotalesR2TT + sumTotalesItaTT + sumTotalesApTT;
+    totalGenCobrador = sumTotalesAsuncionCO + sumTotalesGAsuncionCO + sumTotalesR2CO + sumTotalesItaCO + sumTotalesApCO;
+    totalGenVentaNueva = sumTotalesAsuncionVN + sumTotalesGAsuncionVN + sumTotalesR2VN + sumTotalesItaVN + sumTotalesApVN;
+    totalGenMontoTotal = sumTotalesAsuncionVN + sumTotalesGAsuncionVN + sumTotalesR2VN + sumTotalesItaVN + sumTotalesApVN;
+    
     // Suma las cantidades de los turnos
     for (let t of losTurnosCantidades) {
       if (arrayAsuncion.includes(t.SUCURSAL)) {
@@ -499,7 +516,10 @@ module.exports = (app) => {
       }
     }
 
-    console.log(sumTotalesAsuncionMT);
+    // Totales Generales - CANTIDAD DE TURNOS
+    totalGenAgendado = sumTotalesAsuncionAG + sumTotalesGAsuncionAG + sumTotalesR2AG + sumTotalesItaAG + sumTotalesApAG;
+    totalGenAsistido = sumTotalesAsuncionAS + sumTotalesGAsuncionAS + sumTotalesR2AS + sumTotalesItaAS + sumTotalesApAS;
+    totalGenProfesional = sumTotalesAsuncionPR + sumTotalesGAsuncionPR + sumTotalesR2PR + sumTotalesItaPR + sumTotalesApPR;
   }
 
   // Envia los mensajes
@@ -567,6 +587,9 @@ module.exports = (app) => {
       let ejeYcampo = 690;
 
       let ejeYtotalesAltoP = 710;
+
+      // Eje Y Total General
+      let ejeYTotalGeneral = 730;
 
       for (let r of losReportesFormateado) {
         // Zona ASU
@@ -2560,9 +2583,112 @@ module.exports = (app) => {
         ejeYtotalesAltoP
       );
 
+      // SUM - TOTALES GENERALES
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText("TOTAL GENERAL", ejeXsucu, ejeYTotalGeneral);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        totalGenCuotaSocial.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYTotalGeneral
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        totalGenTratamiento.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYTotalGeneral
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        totalGenCobrador.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYTotalGeneral
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        totalGenVentaNueva.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYTotalGeneral
+      );
+
+      // MONTO TOTAL
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        totalGenMontoTotal.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYTotalGeneral
+      );
+
+      // AGENDADOS
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        totalGenAgendado.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYTotalGeneral
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        totalGenAsistido.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYTotalGeneral
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        totalGenProfesional.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYTotalGeneral
+      );
+
       // Escribe la imagen a archivo
       const buffer = canvas.toBuffer("image/png");
-      fs.writeFileSync("./imagen.png", buffer);
       fs.writeFileSync("./2023-07-19.png", buffer);
 
       // Convierte el canvas en una imagen base64
