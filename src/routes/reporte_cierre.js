@@ -41,14 +41,22 @@ let fileBase64Media = "";
 let mensajeBody = "";
 
 // URL del WWA Prod - Centos
-const wwaUrl = "http://192.168.10.200:3001/lead";
+//const wwaUrl = "http://192.168.10.200:3001/lead";
 // URL al WWA test
-//const wwaUrl = "http://localhost:3001/lead";
+const wwaUrl = "http://localhost:3001/lead";
 
 // Tiempo de retraso de consulta al PGSQL para iniciar el envio. 1 minuto
 var tiempoRetrasoPGSQL = 10000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
+
+// Destinatarios a quien enviar el reporte
+let numerosDestinatarios = [
+  {NOMBRE: 'Ale Corpo', NUMERO: '595974107341'},
+  {NOMBRE: 'José Aquino', NUMERO: '595985604619'},
+  {NOMBRE: 'Alejandro Grance', NUMERO: '595986153301'},
+  {NOMBRE: 'Christell Villalba', NUMERO: '595982155232'},
+  ]
 
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
@@ -56,19 +64,19 @@ module.exports = (app) => {
   const Users = app.db.models.Users;
 
   // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
-  cron.schedule("30 09 * * 1-6", () => {
+  cron.schedule("17 10 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
 
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
-    injeccionFirebird();
+    injeccionFirebirdCierre();
     injeccionFirebirdTurnos();
   });
 
   // Trae los datos del reporte JKMT al PGSQL
-  function injeccionFirebird() {
+  function injeccionFirebirdCierre() {
     let todasSucursales = [
       "1811 SUCURSAL",
       "ADMINISTRACION",
@@ -172,12 +180,12 @@ module.exports = (app) => {
           //console.log('Array formateado para insertar en el POSTGRESQL', nuevoArray);
 
           // Recorre el array que contiene los datos e inserta en la base de postgresql
-          // nuevoArray.forEach((e) => {
-          //   // Poblar PGSQL
-          //   Reporte_cierre.create(e)
-          //     //.then((result) => res.json(result))
-          //     .catch((error) => console.log(error.message));
-          // });
+          nuevoArray.forEach((e) => {
+            // Poblar PGSQL
+            Reporte_cierre.create(e)
+              //.then((result) => res.json(result))
+              .catch((error) => console.log(error.message));
+          });
 
           // IMPORTANTE: cerrar la conexion
           db.detach();
@@ -236,18 +244,20 @@ module.exports = (app) => {
           //console.log(nuevoArray);
 
           // Recorre el array que contiene los datos e inserta en la base de postgresql
-          // nuevoArray.forEach((e) => {
-          //   // Poblar PGSQL
-          //   Reporte_turnos.create(e)
-          //     //.then((result) => res.json(result))
-          //     .catch((error) => console.log(error.message));
-          // });
+          nuevoArray.forEach((e) => {
+            // Poblar PGSQL
+            Reporte_turnos.create(e)
+              //.then((result) => res.json(result))
+              .catch((error) => console.log(error.message));
+          });
 
           // IMPORTANTE: cerrar la conexion
           db.detach();
-          console.log(
-            "Llama a la funcion iniciar envio que se retrasa 1 min en ejecutarse Tickets"
-          );
+          console.log("Llama a la funcion iniciar envio que se retrasa 1 min en ejecutarse Tickets");
+
+          setTimeout(() => {
+            iniciarEnvio();
+          }, 1000 * 60);
         }
       );
     });
@@ -421,7 +431,7 @@ module.exports = (app) => {
     }, tiempoRetrasoPGSQL);
   }
 
-  //iniciarEnvio();
+  iniciarEnvio();
 
   function sumarMontos(los_reportes) {
     let arrayAsuncion = [
@@ -2750,111 +2760,115 @@ module.exports = (app) => {
       // Convierte el canvas en una imagen base64
       const base64Image = canvas.toDataURL();
       fileBase64Media = base64Image.split(",")[1];
-    });
-    // .then(() => {
-    //   mensajeBody = {
-    //     message: mensajePie,
-    //     phone: losTurnos[i].TELEFONO_MOVIL,
-    //     mimeType: fileMimeTypeMedia,
-    //     data: fileBase64Media,
-    //     fileName: "",
-    //     fileSize: "",
-    //   };
+    })
+    
+    .then(async () => {
+      // RECORRE LOS NUMEROS
+      for (let n of numerosDestinatarios) {
+        console.log(n);
+        mensajeBody = {
+          message: "Buenas, " + n.NOMBRE + " se envia el reporte.",
+          phone: n.NUMERO,
+          mimeType: fileMimeTypeMedia,
+          data: fileBase64Media,
+          fileName: "",
+          fileSize: "",
+        };
+      
+      // Funcion ajax para nodejs que realiza los envios a la API free WWA
+      // axios
+      //   .post(wwaUrl, mensajeBody)
+      //   .then((response) => {
+      //     const data = response.data;
 
-    //   //console.log(mensajeBody);
-    // })
-    // .then(() => {
-    //   // Funcion ajax para nodejs que realiza los envios a la API free WWA
-    //   axios
-    //     .post(wwaUrl, mensajeBody)
-    //     .then((response) => {
-    //       const data = response.data;
+      //     if (data.responseExSave.id) {
+      //       console.log("Enviado - OK");
+      //       // Se actualiza el estado a 1
+      //       const body = {
+      //         estado_envio: 1,
+      //       };
 
-    //       if (data.responseExSave.id) {
-    //         console.log("Enviado - OK");
-    //         // Se actualiza el estado a 1
-    //         const body = {
-    //           estado_envio: 1,
-    //         };
+      //       // Tickets.update(body, {
+      //       //   where: { id_turno: turnoId },
+      //       // })
+      //       //   //.then((result) => res.json(result))
+      //       //   .catch((error) => {
+      //       //     res.status(412).json({
+      //       //       msg: error.message,
+      //       //     });
+      //       //   });
+      //     }
 
-    //         Tickets.update(body, {
-    //           where: { id_turno: turnoId },
-    //         })
-    //           //.then((result) => res.json(result))
-    //           .catch((error) => {
-    //             res.status(412).json({
-    //               msg: error.message,
-    //             });
-    //           });
-    //       }
+      //     if (data.responseExSave.unknow) {
+      //       console.log("No Enviado - unknow");
+      //       // Se actualiza el estado a 3
+      //       const body = {
+      //         estado_envio: 3,
+      //       };
 
-    //       if (data.responseExSave.unknow) {
-    //         console.log("No Enviado - unknow");
-    //         // Se actualiza el estado a 3
-    //         const body = {
-    //           estado_envio: 3,
-    //         };
+      //       // Tickets.update(body, {
+      //       //   where: { id_turno: turnoId },
+      //       // })
+      //       //   //.then((result) => res.json(result))
+      //       //   .catch((error) => {
+      //       //     res.status(412).json({
+      //       //       msg: error.message,
+      //       //     });
+      //       //   });
+      //     }
 
-    //         Tickets.update(body, {
-    //           where: { id_turno: turnoId },
-    //         })
-    //           //.then((result) => res.json(result))
-    //           .catch((error) => {
-    //             res.status(412).json({
-    //               msg: error.message,
-    //             });
-    //           });
-    //       }
-
-    //       if (data.responseExSave.error) {
-    //         console.log("No enviado - error");
-    //         const errMsg = data.responseExSave.error.slice(0, 17);
-    //         if (errMsg === "Escanee el código") {
-    //           updateEstatusERROR(turnoId, 104);
-    //           //console.log("Error 104: ", data.responseExSave.error);
-    //         }
-    //         // Sesion cerrada o desvinculada. Puede que se envie al abrir la sesion o al vincular
-    //         if (errMsg === "Protocol error (R") {
-    //           updateEstatusERROR(turnoId, 105);
-    //           //console.log("Error 105: ", data.responseExSave.error);
-    //         }
-    //         // El numero esta mal escrito o supera los 12 caracteres
-    //         if (errMsg === "Evaluation failed") {
-    //           updateEstatusERROR(turnoId, 106);
-    //           //console.log("Error 106: ", data.responseExSave.error);
-    //         }
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error("Ocurrió un error:", error);
-    //     });
-    // });
-
-    await retraso();
+      //     if (data.responseExSave.error) {
+      //       console.log("No enviado - error");
+      //       const errMsg = data.responseExSave.error.slice(0, 17);
+      //       if (errMsg === "Escanee el código") {
+      //         //updateEstatusERROR(turnoId, 104);
+      //         console.log("Error 104: ", data.responseExSave.error);
+      //       }
+      //       // Sesion cerrada o desvinculada. Puede que se envie al abrir la sesion o al vincular
+      //       if (errMsg === "Protocol error (R") {
+      //         //updateEstatusERROR(turnoId, 105);
+      //         console.log("Error 105: ", data.responseExSave.error);
+      //       }
+      //       // El numero esta mal escrito o supera los 12 caracteres
+      //       if (errMsg === "Evaluation failed") {
+      //         //updateEstatusERROR(turnoId, 106);
+      //         console.log("Error 106: ", data.responseExSave.error);
+      //       }
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error("Ocurrió un error:", error);
+      //   });
+      
+        await retraso();
+      }
 
     console.log("Fin del envío del reporte");
+
+    });
+
     // console.log("Luego de 1m se vuelve a consultar al PGSQL");
     // setTimeout(() => {
     //   //iniciarEnvio();
     // }, 10000);
   }
 
-  function updateEstatusERROR(turnoId, cod_error) {
-    // Se actualiza el estado segun el errors
-    const body = {
-      estado_envio: cod_error,
-    };
+  // function updateEstatusERROR(turnoId, cod_error) {
+  //   Se actualiza el estado segun el errors
+  //   const body = {
+  //     estado_envio: cod_error,
+  //   };
 
-    Tickets.update(body, {
-      where: { id_turno: turnoId },
-    })
-      //.then((result) => res.json(result))
-      .catch((error) => {
-        res.status(412).json({
-          msg: error.message,
-        });
-      });
-  }
+  //   Tickets.update(body, {
+  //     where: { id_turno: turnoId },
+  //   })
+  //     .then((result) => res.json(result))
+  //     .catch((error) => {
+  //       res.status(412).json({
+  //         msg: error.message,
+  //       });
+  //     });
+  // }
 
   /*
     Metodos
