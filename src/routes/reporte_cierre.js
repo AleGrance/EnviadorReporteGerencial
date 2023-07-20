@@ -87,6 +87,8 @@ let todasSucursales = [
     "SUC. SANTANI",
   ];
 
+let todasSucursalesActivas = [];
+
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
   const Reporte_turnos = app.db.models.Reporte_turno;
@@ -103,6 +105,39 @@ module.exports = (app) => {
     injeccionFirebirdCierre();
     injeccionFirebirdTurnos();
   });
+
+  // Trae las sucursales activas para cargar en el array de sucs para comprobar las faltantes
+  function getSucursalesActivas () {
+    Firebird.attach(odontos, function (err, db) {
+      if (err) throw err;
+
+      db.query(
+        // Trae las sucursales activas del JKMT
+        "SELECT * FROM VW_SUCURSALES_Y_ZONA",
+
+        function (err, result) {
+          console.log("Cant de registros de sucursales obtenidos:", result.length);
+          //console.log(result);
+
+          // Elimina los espacios en blanco
+          const nuevoArray = result.map(objeto => ({
+            ...objeto,
+            ZONA: objeto.ZONA.trimEnd()
+          }));
+          
+          //console.log(nuevoArray);
+
+          todasSucursalesActivas = nuevoArray;
+
+          console.log("sucursales activas", todasSucursalesActivas);
+          // IMPORTANTE: cerrar la conexion
+          db.detach();
+        }
+      );
+    });
+  }
+
+  getSucursalesActivas();
 
   // Trae los datos del reporte JKMT al PGSQL
   function injeccionFirebirdCierre() {
@@ -258,6 +293,7 @@ module.exports = (app) => {
             }
           }
 
+          // SE FORMATEA EL ARRAY COMO PARA INSERTAR EN EL POSTGRESQL
           const nuevoArray = result.reduce((acumulador, objeto) => {
             const index = acumulador.findIndex((item) => item.SUCURSAL === objeto.SUCURSAL);
 
@@ -475,7 +511,7 @@ module.exports = (app) => {
     }, tiempoRetrasoPGSQL);
   }
 
-  iniciarEnvio();
+  //iniciarEnvio();
 
   function sumarMontos(los_reportes) {
     let arrayAsuncion = [
