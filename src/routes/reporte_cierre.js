@@ -292,6 +292,26 @@ module.exports = (app) => {
   let sumTotalesR2AS = 0;
   let sumTotalesR2PR = 0;
 
+  // Sub Totales Zona Itapua
+  let sumTotalesItaCS = 0;
+  let sumTotalesItaTT = 0;
+  let sumTotalesItaCO = 0;
+  let sumTotalesItaVN = 0;
+  let sumTotalesItaMT = 0;
+  let sumTotalesItaAG = 0;
+  let sumTotalesItaAS = 0;
+  let sumTotalesItaPR = 0;
+
+  // Sub Totales Zona Alto Parana
+  let sumTotalesApCS = 0;
+  let sumTotalesApTT = 0;
+  let sumTotalesApCO = 0;
+  let sumTotalesApVN = 0;
+  let sumTotalesApMT = 0;
+  let sumTotalesApAG = 0;
+  let sumTotalesApAS = 0;
+  let sumTotalesApPR = 0;
+
   function iniciarEnvio() {
     setTimeout(() => {
       // Datos de las cantidades de los turnos
@@ -369,6 +389,9 @@ module.exports = (app) => {
     let arrayAsuncion = ['MARISCAL LOPEZ', 'AVENIDA QUINTA', 'VILLA MORRA', 'ARTIGAS', 'LUISITO', 'PALMA'];
     let arrayGAsuncion = ['LAMBARE', 'CATEDRAL', 'LUQUE', 'LA RURAL', 'ÑEMBY', 'ITAUGUA', '1811 SUCURSAL', 'KM 14 Y MEDIO', 'CAPIATA'];
     let arrayRuta2 = ['CAACUPE', 'CORONEL OVIEDO'];
+    let arrayItapua = ['HOHENAU', 'ENCARNACION CENTRO', 'MARIA AUXILIADORA', 'AYOLAS'];
+    let arrayAltop = ['KM 7', 'SANTA RITA', 'CAMPO 9'];
+
     //console.log('DESDE SUMAR MONTOS', los_reportes.length);
 
     for(let r of los_reportes) {
@@ -396,6 +419,22 @@ module.exports = (app) => {
         sumTotalesR2VN += parseInt(r.VENTA_NUEVA); 
         sumTotalesR2MT += parseInt(r.MONTO_TOTAL); 
       }
+
+      if(arrayItapua.includes(r.SUCURSAL)) {
+        sumTotalesItaCS += parseInt(r.CUOTA_SOCIAL); 
+        sumTotalesItaTT += parseInt(r.TRATAMIENTO); 
+        sumTotalesItaCO += parseInt(r.COBRADOR); 
+        sumTotalesItaVN += parseInt(r.VENTA_NUEVA); 
+        sumTotalesItaMT += parseInt(r.MONTO_TOTAL); 
+      }
+
+      if(arrayAltop.includes(r.SUCURSAL)) {
+        sumTotalesApCS += parseInt(r.CUOTA_SOCIAL); 
+        sumTotalesApTT += parseInt(r.TRATAMIENTO); 
+        sumTotalesApCO += parseInt(r.COBRADOR); 
+        sumTotalesApVN += parseInt(r.VENTA_NUEVA); 
+        sumTotalesApMT += parseInt(r.MONTO_TOTAL); 
+      }
     }
 
     // Suma las cantidades de los turnos
@@ -416,6 +455,18 @@ module.exports = (app) => {
         sumTotalesR2AG += parseInt(t.AGENDADOS); 
         sumTotalesR2AS += parseInt(t.ASISTIDOS); 
         sumTotalesR2PR += parseInt(t.PROFESIONAL); 
+      }
+
+      if (arrayItapua.includes(t.SUCURSAL)) {
+        sumTotalesItaAG += parseInt(t.AGENDADOS); 
+        sumTotalesItaAS += parseInt(t.ASISTIDOS); 
+        sumTotalesItaPR += parseInt(t.PROFESIONAL); 
+      }
+
+      if (arrayAltop.includes(t.SUCURSAL)) {
+        sumTotalesApAG += parseInt(t.AGENDADOS); 
+        sumTotalesApAS += parseInt(t.ASISTIDOS); 
+        sumTotalesApPR += parseInt(t.PROFESIONAL); 
       }
     }
 
@@ -475,6 +526,19 @@ module.exports = (app) => {
       let ejeYcoro = 510;
 
       let ejeYtotalesRuta2 = 530;
+
+      let ejeYhohe = 550;
+      let ejeYencar = 570;
+      let ejeYmaria = 590;
+      let ejeYayo = 610;
+
+      let ejeYtotalesItapua = 630;
+
+      let ejeYkm7 = 650;
+      let ejeYsanta = 670;
+      let ejeYcampo = 690;
+
+      let ejeYtotalesAltoP = 710;
 
 
       for (let r of losReportesFormateado) {
@@ -1517,6 +1581,435 @@ module.exports = (app) => {
           context.textAlign = "center";
           context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcoro);
         }
+
+        // Zona Itapua
+        if (r.SUCURSAL == "HOHENAU") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYhohe);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYhohe);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYhohe);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYhohe);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYhohe);
+        }
+
+        if (r.SUCURSAL == "ENCARNACION CENTRO") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYencar);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYencar);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYencar);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYencar);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYencar);
+        }
+
+        if (r.SUCURSAL == "MARIA AUXILIADORA") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYmaria);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYmaria);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYmaria);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYmaria);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYmaria);
+        }
+
+        if (r.SUCURSAL == "AYOLAS") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYayo);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYayo);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYayo);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYayo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYayo);
+        }
+
+        // Zona Alto Parana
+        if (r.SUCURSAL == "KM 7") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYkm7);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYkm7);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYkm7);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYkm7);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYkm7);
+        }
+
+        if (r.SUCURSAL == "SANTA RITA") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYsanta);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYsanta);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYsanta);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYsanta);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYsanta);
+        }
+
+        if (r.SUCURSAL == "CAMPO 9") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYcampo);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYcampo);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYcampo);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";        
+          context.fillText(r.FECHA, ejeXfecha, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYcampo);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcampo);
+        }
       }
 
       // Fila totales ZONA ASUNCION
@@ -1736,6 +2229,150 @@ module.exports = (app) => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }), ejeXprofesional, ejeYtotalesRuta2);
+
+      // SUM - Monto Total ZONA ITAPUA
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText('ZONA ITAPUA', ejeXsucu, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesItaCS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcuota, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesItaTT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXtrata, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesItaCO.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcobra, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesItaVN.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXventa, ejeYtotalesItapua);
+
+      // MONTO TOTAL
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesItaMT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXmonto, ejeYtotalesItapua);
+
+      // AGENDADOS
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesItaAG.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXagendado, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesItaAS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXasistido, ejeYtotalesItapua);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesItaPR.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXprofesional, ejeYtotalesItapua);
+
+      // SUM - Monto Total ZONA ALTO PARANA
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText('ZONA ALTO PARANA', ejeXsucu, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesApCS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcuota, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesApTT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXtrata, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesApCO.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXcobra, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesApVN.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXventa, ejeYtotalesAltoP);
+
+      // MONTO TOTAL
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(sumTotalesApMT.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXmonto, ejeYtotalesAltoP);
+
+      // AGENDADOS
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesApAG.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXagendado, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesApAS.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXasistido, ejeYtotalesAltoP);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(sumTotalesApPR.toLocaleString("es", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }), ejeXprofesional, ejeYtotalesAltoP);
 
 
 
