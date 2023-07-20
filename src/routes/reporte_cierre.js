@@ -58,6 +58,35 @@ let numerosDestinatarios = [
   {NOMBRE: 'Christell Villalba', NUMERO: '595982155232'},
   ]
 
+let todasSucursales = [
+    "1811 SUCURSAL",
+    "ADMINISTRACION",
+    "ARTIGAS",
+    "AVENIDA QUINTA",
+    "AYOLAS",
+    "CAACUPE",
+    "CAMPO 9",
+    "CAPIATA",
+    "CATEDRAL",
+    "CORONEL OVIEDO",
+    "ENCARNACION CENTRO",
+    "HOHENAU",
+    "ITAUGUA",
+    "KM 14 Y MEDIO",
+    "KM 7",
+    "LA RURAL",
+    "LAMBARE",
+    "LUISITO",
+    "LUQUE",
+    "MARIA AUXILIADORA",
+    "MARISCAL LOPEZ",
+    "PALMA",
+    "SANTA RITA",
+    "VILLA MORRA",
+    "ÑEMBY",
+    "SUC. SANTANI",
+  ];
+
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
   const Reporte_turnos = app.db.models.Reporte_turno;
@@ -77,35 +106,6 @@ module.exports = (app) => {
 
   // Trae los datos del reporte JKMT al PGSQL
   function injeccionFirebirdCierre() {
-    let todasSucursales = [
-      "1811 SUCURSAL",
-      "ADMINISTRACION",
-      "ARTIGAS",
-      "AVENIDA QUINTA",
-      "AYOLAS",
-      "CAACUPE",
-      "CAMPO 9",
-      "CAPIATA",
-      "CATEDRAL",
-      "CORONEL OVIEDO",
-      "ENCARNACION CENTRO",
-      "HOHENAU",
-      "ITAUGUA",
-      "KM 14 Y MEDIO",
-      "KM 7",
-      "LA RURAL",
-      "LAMBARE",
-      "LUISITO",
-      "LUQUE",
-      "MARIA AUXILIADORA",
-      "MARISCAL LOPEZ",
-      "PALMA",
-      "SANTA RITA",
-      "VILLA MORRA",
-      "ÑEMBY",
-      "SUC. SANTANI",
-    ];
-
     let todasSucursalesReporte = [];
 
     let fechaHoy = new Date().toISOString().slice(0, 10);
@@ -197,11 +197,19 @@ module.exports = (app) => {
     });
   }
 
-  //injeccionFirebird();
+  //injeccionFirebirdCierre();
 
   // Trae las cantidades de los turnos
   function injeccionFirebirdTurnos() {
-    let fechaHoy = new Date().toISOString().slice(0, 10);
+    let todasSucursalesReporte = [];
+
+    const fechaHoy = new Date();
+    let year = fechaHoy.getFullYear();
+    let month = fechaHoy.getMonth() + 1;
+    let day = fechaHoy.getDate();
+
+    // La fecha filtro para buscar los registros
+    let fechaHoyFiltro = year + '-' + month + '-' + day;
 
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
@@ -224,12 +232,38 @@ module.exports = (app) => {
           console.log("Cant de registros de turnos por sucursal obtenidos del JKMT:", result.length);
           //console.log(result);
 
+          // Se carga la lista de las sucursales presentes para checkear las que no estan
+          for (let r of result) {
+            if (!todasSucursalesReporte.includes(r.SUCURSAL)) {
+              todasSucursalesReporte.push(r.SUCURSAL);
+            }
+          }
+
+          //console.log(todasSucursalesReporte);
+
+          // Checkea las sucursales que no estan en la lista
+          // Si no esta se crea el objeto y carga en el array
+          for (let su of todasSucursales) {
+            if (!todasSucursalesReporte.includes(su)) {
+              let objSucursalFaltante = {
+                FECHA: fechaHoyFiltro,
+                SUCURSAL: su,
+                AGENDADOS: 0,
+                ASISTIDOS: 0,
+                PROFESIONAL: 0,
+              };
+
+              result.push(objSucursalFaltante);
+              //console.log("Sucursales que NO estan", su);
+            }
+          }
+
           const nuevoArray = result.reduce((acumulador, objeto) => {
             const index = acumulador.findIndex((item) => item.SUCURSAL === objeto.SUCURSAL);
 
             if (index === -1) {
               acumulador.push({
-                FECHA: fechaHoy,
+                FECHA: fechaHoyFiltro,
                 SUCURSAL: objeto.SUCURSAL,
                 AGENDADOS: objeto.AGENDADOS,
                 ASISTIDOS: objeto.ASISTIDOS,
@@ -319,6 +353,16 @@ module.exports = (app) => {
   let sumTotalesApAG = 0;
   let sumTotalesApAS = 0;
   let sumTotalesApPR = 0;
+
+  // Sub Totales Zona San Pedro
+  let sumTotalesSpCS = 0;
+  let sumTotalesSpTT = 0;
+  let sumTotalesSpCO = 0;
+  let sumTotalesSpVN = 0;
+  let sumTotalesSpMT = 0;
+  let sumTotalesSpAG = 0;
+  let sumTotalesSpAS = 0;
+  let sumTotalesSpPR = 0;
 
   // Totales Generales
   let totalGenCuotaSocial = 0;
@@ -456,6 +500,7 @@ module.exports = (app) => {
     let arrayRuta2 = ["CAACUPE", "CORONEL OVIEDO"];
     let arrayItapua = ["HOHENAU", "ENCARNACION CENTRO", "MARIA AUXILIADORA", "AYOLAS"];
     let arrayAltop = ["KM 7", "SANTA RITA", "CAMPO 9"];
+    let arraySanpe = ["SUC. SANTANI"];
 
     //console.log('DESDE SUMAR MONTOS', los_reportes.length);
 
@@ -500,6 +545,14 @@ module.exports = (app) => {
         sumTotalesApVN += parseInt(r.VENTA_NUEVA);
         sumTotalesApMT += parseInt(r.MONTO_TOTAL);
       }
+
+      if (arraySanpe.includes(r.SUCURSAL)) {
+        sumTotalesSpCS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesSpTT += parseInt(r.TRATAMIENTO);
+        sumTotalesSpCO += parseInt(r.COBRADOR);
+        sumTotalesSpVN += parseInt(r.VENTA_NUEVA);
+        sumTotalesSpMT += parseInt(r.MONTO_TOTAL);
+      }
     }
 
     // Totales Generales - CIERRES DE CAJA
@@ -508,31 +561,36 @@ module.exports = (app) => {
       sumTotalesGAsuncionCS +
       sumTotalesR2CS +
       sumTotalesItaCS +
-      sumTotalesApCS;
+      sumTotalesApCS +
+      sumTotalesSpCS;
     totalGenTratamiento =
       sumTotalesAsuncionTT +
       sumTotalesGAsuncionTT +
       sumTotalesR2TT +
       sumTotalesItaTT +
-      sumTotalesApTT;
+      sumTotalesApTT +
+      sumTotalesSpTT;
     totalGenCobrador =
       sumTotalesAsuncionCO +
       sumTotalesGAsuncionCO +
       sumTotalesR2CO +
       sumTotalesItaCO +
-      sumTotalesApCO;
+      sumTotalesApCO +
+      sumTotalesSpCO;
     totalGenVentaNueva =
       sumTotalesAsuncionVN +
       sumTotalesGAsuncionVN +
       sumTotalesR2VN +
       sumTotalesItaVN +
-      sumTotalesApVN;
+      sumTotalesApVN +
+      sumTotalesSpVN;
     totalGenMontoTotal =
       sumTotalesAsuncionMT +
       sumTotalesGAsuncionMT +
       sumTotalesR2MT +
       sumTotalesItaMT +
-      sumTotalesApMT;
+      sumTotalesApMT +
+      sumTotalesSpMT;
 
     // Suma las cantidades de los turnos
     for (let t of losTurnosCantidades) {
@@ -564,6 +622,12 @@ module.exports = (app) => {
         sumTotalesApAG += parseInt(t.AGENDADOS);
         sumTotalesApAS += parseInt(t.ASISTIDOS);
         sumTotalesApPR += parseInt(t.PROFESIONAL);
+      }
+
+      if (arraySanpe.includes(t.SUCURSAL)) {
+        sumTotalesSpAG += parseInt(t.AGENDADOS);
+        sumTotalesSpAS += parseInt(t.ASISTIDOS);
+        sumTotalesSpPR += parseInt(t.PROFESIONAL);
       }
     }
 
@@ -654,8 +718,12 @@ module.exports = (app) => {
 
       let ejeYtotalesAltoP = 710;
 
+      let ejeYsantani = 730;
+
+      let ejeYtotalesSanPe = 750;
+
       // Eje Y Total General
-      let ejeYTotalGeneral = 750;
+      let ejeYTotalGeneral = 770;
 
       for (let r of losReportesFormateado) {
         // Zona ASU
@@ -2126,6 +2194,68 @@ module.exports = (app) => {
           context.textAlign = "center";
           context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYcampo);
         }
+
+        // Zona San Pedro
+        if (r.SUCURSAL == "SUC. SANTANI") {
+          // Busca los turnos por sucursal y los dibuja en el canva
+          for (let t of losTurnosCantidades) {
+            if (r.SUCURSAL == t.SUCURSAL) {
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.AGENDADOS, ejeXagendado, ejeYsantani);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.ASISTIDOS, ejeXasistido, ejeYsantani);
+
+              context.font = "bold 15px Arial";
+              context.fillStyle = "#34495E";
+              context.textAlign = "left";
+              context.shadowColor = "red";
+              context.fillText(t.PROFESIONAL, ejeXprofesional, ejeYsantani);
+            }
+          }
+
+          // Se dibuja los datos del cierre
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.FECHA, ejeXfecha, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "left";
+          context.fillText(r.SUCURSAL, ejeXsucu, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.CUOTA_SOCIAL, ejeXcuota, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.TRATAMIENTO, ejeXtrata, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.COBRADOR, ejeXcobra, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.VENTA_NUEVA, ejeXventa, ejeYsantani);
+
+          context.font = "bold 15px Arial";
+          context.fillStyle = "#34495E";
+          context.textAlign = "center";
+          context.fillText(r.MONTO_TOTAL, ejeXmonto, ejeYsantani);
+        }
       }
 
       // Fila totales ZONA ASUNCION
@@ -2647,6 +2777,110 @@ module.exports = (app) => {
         }),
         ejeXprofesional,
         ejeYtotalesAltoP
+      );
+
+      // SUM - Monto Total ZONA SAN PEDRO
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText("ZONA ALTO PARANA", ejeXsucu, ejeYtotalesSanPe);
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        sumTotalesSpCS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesSanPe
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        sumTotalesSpTT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesSanPe
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        sumTotalesSpCO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesSanPe
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        sumTotalesSpVN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesSanPe
+      );
+
+      // MONTO TOTAL
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "center";
+      context.fillText(
+        sumTotalesSpMT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesSanPe
+      );
+
+      // AGENDADOS
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        sumTotalesSpAG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesSanPe
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        sumTotalesSpAS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesSanPe
+      );
+
+      context.font = "bold 15px Arial";
+      context.fillStyle = "#34495E";
+      context.textAlign = "left";
+      context.fillText(
+        sumTotalesSpPR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesSanPe
       );
 
       // SUM - TOTALES GENERALES
