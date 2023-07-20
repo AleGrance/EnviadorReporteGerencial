@@ -139,7 +139,7 @@ module.exports = (app) => {
 
   getSucursalesActivas();
 
-  // Trae los datos del reporte JKMT al PGSQL
+  // Trae los datos de los cierres del JKMT al PGSQL
   function injeccionFirebirdCierre() {
     let todasSucursalesReporte = [];
 
@@ -167,16 +167,16 @@ module.exports = (app) => {
 
           // Checkea las sucursales que no estan en la lista
           // Si no esta se crea el objeto y carga en el array
-          for (let su of todasSucursales) {
-            if (!todasSucursalesReporte.includes(su)) {
+          for (let su of todasSucursalesActivas) {
+            if (!todasSucursalesReporte.includes(su.NOMBRE)) {
               let objSucursalFaltante = {
-                SUCURSAL: su,
+                SUCURSAL: su.NOMBRE,
                 CONCEPTO: "TRATAMIENTO",
                 MONTO: 0,
               };
 
               result.push(objSucursalFaltante);
-              //console.log("Sucursales que NO estan", su);
+              //console.log("Sucursales que NO estan", su.NOMBRE);
             }
           }
 
@@ -232,9 +232,9 @@ module.exports = (app) => {
     });
   }
 
-  //injeccionFirebirdCierre();
+  injeccionFirebirdCierre();
 
-  // Trae las cantidades de los turnos
+  // Trae las cantidades de los turnos del JKMT al PGSQL
   function injeccionFirebirdTurnos() {
     let todasSucursalesReporte = [];
 
@@ -278,18 +278,18 @@ module.exports = (app) => {
 
           // Checkea las sucursales que no estan en la lista
           // Si no esta se crea el objeto y carga en el array
-          for (let su of todasSucursales) {
-            if (!todasSucursalesReporte.includes(su)) {
+          for (let su of todasSucursalesActivas) {
+            if (!todasSucursalesReporte.includes(su.NOMBRE)) {
               let objSucursalFaltante = {
                 FECHA: fechaHoyFiltro,
-                SUCURSAL: su,
+                SUCURSAL: su.NOMBRE,
                 AGENDADOS: 0,
                 ASISTIDOS: 0,
                 PROFESIONAL: 0,
               };
 
               result.push(objSucursalFaltante);
-              //console.log("Sucursales que NO estan", su);
+              //console.log("Sucursales que NO estan", su.NOMBRE);
             }
           }
 
@@ -3123,6 +3123,7 @@ module.exports = (app) => {
     // }, 10000);
   }
 
+  // Actualizacion de estados de envio - NO SE USA
   // function updateEstatusERROR(turnoId, cod_error) {
   //   Se actualiza el estado segun el errors
   //   const body = {
@@ -3140,136 +3141,140 @@ module.exports = (app) => {
   //     });
   // }
 
+
+
+
+
   /*
     Metodos
   */
 
-  app
-    .route("/tickets")
-    .get((req, res) => {
-      Tickets.findAll({
-        order: [["createdAt", "DESC"]],
-      })
-        .then((result) => res.json(result))
-        .catch((error) => {
-          res.status(402).json({
-            msg: error.menssage,
-          });
-        });
-    })
-    .post((req, res) => {
-      console.log(req.body);
-      Tickets.create(req.body)
-        .then((result) => res.json(result))
-        .catch((error) => res.json(error));
-    });
+  // app
+  //   .route("/tickets")
+  //   .get((req, res) => {
+  //     Tickets.findAll({
+  //       order: [["createdAt", "DESC"]],
+  //     })
+  //       .then((result) => res.json(result))
+  //       .catch((error) => {
+  //         res.status(402).json({
+  //           msg: error.menssage,
+  //         });
+  //       });
+  //   })
+  //   .post((req, res) => {
+  //     console.log(req.body);
+  //     Tickets.create(req.body)
+  //       .then((result) => res.json(result))
+  //       .catch((error) => res.json(error));
+  //   });
 
   // Trae los turnos que tengan en el campo estado_envio = 0
-  app.route("/ticketsPendientes").get((req, res) => {
-    Tickets.findAll({
-      where: { estado_envio: 0 },
-      order: [["FECHA_CREACION", "ASC"]],
-      //limit: 5
-    })
-      .then((result) => res.json(result))
-      .catch((error) => {
-        res.status(402).json({
-          msg: error.menssage,
-        });
-      });
-  });
+  // app.route("/ticketsPendientes").get((req, res) => {
+  //   Tickets.findAll({
+  //     where: { estado_envio: 0 },
+  //     order: [["FECHA_CREACION", "ASC"]],
+  //     //limit: 5
+  //   })
+  //     .then((result) => res.json(result))
+  //     .catch((error) => {
+  //       res.status(402).json({
+  //         msg: error.menssage,
+  //       });
+  //     });
+  // });
 
   // Trae los turnos que ya fueron notificados hoy
-  app.route("/ticketsNotificados").get((req, res) => {
-    // Fecha de hoy 2022-02-30
-    let fechaHoy = new Date().toISOString().slice(0, 10);
+  // app.route("/ticketsNotificados").get((req, res) => {
+  //   // Fecha de hoy 2022-02-30
+  //   let fechaHoy = new Date().toISOString().slice(0, 10);
 
-    Tickets.count({
-      where: {
-        [Op.and]: [
-          { estado_envio: 1 },
-          {
-            updatedAt: {
-              [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
-            },
-          },
-        ],
-      },
-      //order: [["FECHA_CREACION", "DESC"]],
-    })
-      .then((result) => res.json(result))
-      .catch((error) => {
-        res.status(402).json({
-          msg: error.menssage,
-        });
-      });
-  });
+  //   Tickets.count({
+  //     where: {
+  //       [Op.and]: [
+  //         { estado_envio: 1 },
+  //         {
+  //           updatedAt: {
+  //             [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     //order: [["FECHA_CREACION", "DESC"]],
+  //   })
+  //     .then((result) => res.json(result))
+  //     .catch((error) => {
+  //       res.status(402).json({
+  //         msg: error.menssage,
+  //       });
+  //     });
+  // });
 
   // Trae la cantidad de turnos enviados por rango de fecha desde hasta
-  app.route("/ticketsNotificadosFecha").post((req, res) => {
-    let fechaHoy = new Date().toISOString().slice(0, 10);
-    let { fecha_desde, fecha_hasta } = req.body;
+  // app.route("/ticketsNotificadosFecha").post((req, res) => {
+  //   let fechaHoy = new Date().toISOString().slice(0, 10);
+  //   let { fecha_desde, fecha_hasta } = req.body;
 
-    if (fecha_desde === "" && fecha_hasta === "") {
-      fecha_desde = fechaHoy;
-      fecha_hasta = fechaHoy;
-    }
+  //   if (fecha_desde === "" && fecha_hasta === "") {
+  //     fecha_desde = fechaHoy;
+  //     fecha_hasta = fechaHoy;
+  //   }
 
-    if (fecha_hasta == "") {
-      fecha_hasta = fecha_desde;
-    }
+  //   if (fecha_hasta == "") {
+  //     fecha_hasta = fecha_desde;
+  //   }
 
-    if (fecha_desde == "") {
-      fecha_desde = fecha_hasta;
-    }
+  //   if (fecha_desde == "") {
+  //     fecha_desde = fecha_hasta;
+  //   }
 
-    console.log(req.body);
+  //   console.log(req.body);
 
-    Tickets.count({
-      where: {
-        [Op.and]: [
-          { estado_envio: 1 },
-          {
-            updatedAt: {
-              [Op.between]: [fecha_desde + " 00:00:00", fecha_hasta + " 23:59:59"],
-            },
-          },
-        ],
-      },
-      //order: [["createdAt", "DESC"]],
-    })
-      .then((result) => res.json(result))
-      .catch((error) => {
-        res.status(402).json({
-          msg: error.menssage,
-        });
-      });
-  });
+  //   Tickets.count({
+  //     where: {
+  //       [Op.and]: [
+  //         { estado_envio: 1 },
+  //         {
+  //           updatedAt: {
+  //             [Op.between]: [fecha_desde + " 00:00:00", fecha_hasta + " 23:59:59"],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     //order: [["createdAt", "DESC"]],
+  //   })
+  //     .then((result) => res.json(result))
+  //     .catch((error) => {
+  //       res.status(402).json({
+  //         msg: error.menssage,
+  //       });
+  //     });
+  // });
 
   // Turnos no enviados - estado_envio 2 o 3
-  app.route("/ticketsNoNotificados").get((req, res) => {
-    // Fecha de hoy 2022-02-30
-    let fechaHoy = new Date().toISOString().slice(0, 10);
-    Tickets.count({
-      where: {
-        [Op.and]: [
-          { estado_envio: { [Op.in]: [2, 3] } },
-          {
-            updatedAt: {
-              [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
-            },
-          },
-        ],
-      },
-      //order: [["FECHA_CREACION", "DESC"]],
-    })
-      .then((result) => res.json(result))
-      .catch((error) => {
-        res.status(402).json({
-          msg: error.menssage,
-        });
-      });
-  });
+  // app.route("/ticketsNoNotificados").get((req, res) => {
+  //   // Fecha de hoy 2022-02-30
+  //   let fechaHoy = new Date().toISOString().slice(0, 10);
+  //   Tickets.count({
+  //     where: {
+  //       [Op.and]: [
+  //         { estado_envio: { [Op.in]: [2, 3] } },
+  //         {
+  //           updatedAt: {
+  //             [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     //order: [["FECHA_CREACION", "DESC"]],
+  //   })
+  //     .then((result) => res.json(result))
+  //     .catch((error) => {
+  //       res.status(402).json({
+  //         msg: error.menssage,
+  //       });
+  //     });
+  // });
 
   // // Trae la cantidad de turnos enviados por rango de fecha desde hasta
   // app.route("/turnosNoNotificadosFecha").post((req, res) => {
@@ -3315,46 +3320,46 @@ module.exports = (app) => {
   //     });
   // });
 
-  app
-    .route("/tickets/:id_turno")
-    .get((req, res) => {
-      Tickets.findOne({
-        where: req.params,
-        include: [
-          {
-            model: Users,
-            attributes: ["user_fullname"],
-          },
-        ],
-      })
-        .then((result) => res.json(result))
-        .catch((error) => {
-          res.status(404).json({
-            msg: error.message,
-          });
-        });
-    })
-    .put((req, res) => {
-      Tickets.update(req.body, {
-        where: req.params,
-      })
-        .then((result) => res.json(result))
-        .catch((error) => {
-          res.status(412).json({
-            msg: error.message,
-          });
-        });
-    })
-    .delete((req, res) => {
-      //const id = req.params.id;
-      Tickets.destroy({
-        where: req.params,
-      })
-        .then(() => res.json(req.params))
-        .catch((error) => {
-          res.status(412).json({
-            msg: error.message,
-          });
-        });
-    });
+  // app
+  //   .route("/tickets/:id_turno")
+  //   .get((req, res) => {
+  //     Tickets.findOne({
+  //       where: req.params,
+  //       include: [
+  //         {
+  //           model: Users,
+  //           attributes: ["user_fullname"],
+  //         },
+  //       ],
+  //     })
+  //       .then((result) => res.json(result))
+  //       .catch((error) => {
+  //         res.status(404).json({
+  //           msg: error.message,
+  //         });
+  //       });
+  //   })
+  //   .put((req, res) => {
+  //     Tickets.update(req.body, {
+  //       where: req.params,
+  //     })
+  //       .then((result) => res.json(result))
+  //       .catch((error) => {
+  //         res.status(412).json({
+  //           msg: error.message,
+  //         });
+  //       });
+  //   })
+  //   .delete((req, res) => {
+  //     //const id = req.params.id;
+  //     Tickets.destroy({
+  //       where: req.params,
+  //     })
+  //       .then(() => res.json(req.params))
+  //       .catch((error) => {
+  //         res.status(412).json({
+  //           msg: error.message,
+  //         });
+  //       });
+  //   });
 };
