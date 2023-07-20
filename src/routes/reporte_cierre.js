@@ -359,8 +359,20 @@ module.exports = (app) => {
                     maximumFractionDigits: 0,
                   })
                 : objeto.TRATAMIENTO,
-            COBRADOR: objeto.COBRADOR,
-            VENTA_NUEVA: objeto.VENTA_NUEVA,
+            COBRADOR:
+              objeto.COBRADOR !== "0"
+                ? parseFloat(objeto.COBRADOR).toLocaleString("es", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })
+                : objeto.COBRADOR,
+            VENTA_NUEVA:
+              objeto.VENTA_NUEVA !== "0"
+                ? parseFloat(objeto.VENTA_NUEVA).toLocaleString("es", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })
+                : objeto.VENTA_NUEVA,
             MONTO_TOTAL:
               objeto.MONTO_TOTAL !== "0"
                 ? parseFloat(objeto.MONTO_TOTAL).toLocaleString("es", {
@@ -386,92 +398,108 @@ module.exports = (app) => {
   iniciarEnvio();
 
   function sumarMontos(los_reportes) {
-    let arrayAsuncion = ['MARISCAL LOPEZ', 'AVENIDA QUINTA', 'VILLA MORRA', 'ARTIGAS', 'LUISITO', 'PALMA'];
-    let arrayGAsuncion = ['LAMBARE', 'CATEDRAL', 'LUQUE', 'LA RURAL', 'ÑEMBY', 'ITAUGUA', '1811 SUCURSAL', 'KM 14 Y MEDIO', 'CAPIATA'];
-    let arrayRuta2 = ['CAACUPE', 'CORONEL OVIEDO'];
-    let arrayItapua = ['HOHENAU', 'ENCARNACION CENTRO', 'MARIA AUXILIADORA', 'AYOLAS'];
-    let arrayAltop = ['KM 7', 'SANTA RITA', 'CAMPO 9'];
+    let arrayAsuncion = [
+      "MARISCAL LOPEZ",
+      "AVENIDA QUINTA",
+      "VILLA MORRA",
+      "ARTIGAS",
+      "LUISITO",
+      "PALMA",
+    ];
+    let arrayGAsuncion = [
+      "LAMBARE",
+      "CATEDRAL",
+      "LUQUE",
+      "LA RURAL",
+      "ÑEMBY",
+      "ITAUGUA",
+      "1811 SUCURSAL",
+      "KM 14 Y MEDIO",
+      "CAPIATA",
+    ];
+    let arrayRuta2 = ["CAACUPE", "CORONEL OVIEDO"];
+    let arrayItapua = ["HOHENAU", "ENCARNACION CENTRO", "MARIA AUXILIADORA", "AYOLAS"];
+    let arrayAltop = ["KM 7", "SANTA RITA", "CAMPO 9"];
 
     //console.log('DESDE SUMAR MONTOS', los_reportes.length);
 
-    for(let r of los_reportes) {
+    for (let r of los_reportes) {
       // Suma los montos de los cierres
-      if(arrayAsuncion.includes(r.SUCURSAL)) {
-        sumTotalesAsuncionCS += parseInt(r.CUOTA_SOCIAL); 
-        sumTotalesAsuncionTT += parseInt(r.TRATAMIENTO); 
-        sumTotalesAsuncionCO += parseInt(r.COBRADOR); 
-        sumTotalesAsuncionVN += parseInt(r.VENTA_NUEVA); 
-        sumTotalesAsuncionMT += parseInt(r.MONTO_TOTAL); 
+      if (arrayAsuncion.includes(r.SUCURSAL)) {
+        sumTotalesAsuncionCS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesAsuncionTT += parseInt(r.TRATAMIENTO);
+        sumTotalesAsuncionCO += parseInt(r.COBRADOR);
+        sumTotalesAsuncionVN += parseInt(r.VENTA_NUEVA);
+        sumTotalesAsuncionMT += parseInt(r.MONTO_TOTAL);
       }
 
-      if(arrayGAsuncion.includes(r.SUCURSAL)) {
-        sumTotalesGAsuncionCS += parseInt(r.CUOTA_SOCIAL); 
-        sumTotalesGAsuncionTT += parseInt(r.TRATAMIENTO); 
-        sumTotalesGAsuncionCO += parseInt(r.COBRADOR); 
-        sumTotalesGAsuncionVN += parseInt(r.VENTA_NUEVA); 
-        sumTotalesGAsuncionMT += parseInt(r.MONTO_TOTAL); 
+      if (arrayGAsuncion.includes(r.SUCURSAL)) {
+        sumTotalesGAsuncionCS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesGAsuncionTT += parseInt(r.TRATAMIENTO);
+        sumTotalesGAsuncionCO += parseInt(r.COBRADOR);
+        sumTotalesGAsuncionVN += parseInt(r.VENTA_NUEVA);
+        sumTotalesGAsuncionMT += parseInt(r.MONTO_TOTAL);
       }
 
-      if(arrayRuta2.includes(r.SUCURSAL)) {
-        sumTotalesR2CS += parseInt(r.CUOTA_SOCIAL); 
-        sumTotalesR2TT += parseInt(r.TRATAMIENTO); 
-        sumTotalesR2CO += parseInt(r.COBRADOR); 
-        sumTotalesR2VN += parseInt(r.VENTA_NUEVA); 
-        sumTotalesR2MT += parseInt(r.MONTO_TOTAL); 
+      if (arrayRuta2.includes(r.SUCURSAL)) {
+        sumTotalesR2CS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesR2TT += parseInt(r.TRATAMIENTO);
+        sumTotalesR2CO += parseInt(r.COBRADOR);
+        sumTotalesR2VN += parseInt(r.VENTA_NUEVA);
+        sumTotalesR2MT += parseInt(r.MONTO_TOTAL);
       }
 
-      if(arrayItapua.includes(r.SUCURSAL)) {
-        sumTotalesItaCS += parseInt(r.CUOTA_SOCIAL); 
-        sumTotalesItaTT += parseInt(r.TRATAMIENTO); 
-        sumTotalesItaCO += parseInt(r.COBRADOR); 
-        sumTotalesItaVN += parseInt(r.VENTA_NUEVA); 
-        sumTotalesItaMT += parseInt(r.MONTO_TOTAL); 
+      if (arrayItapua.includes(r.SUCURSAL)) {
+        sumTotalesItaCS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesItaTT += parseInt(r.TRATAMIENTO);
+        sumTotalesItaCO += parseInt(r.COBRADOR);
+        sumTotalesItaVN += parseInt(r.VENTA_NUEVA);
+        sumTotalesItaMT += parseInt(r.MONTO_TOTAL);
       }
 
-      if(arrayAltop.includes(r.SUCURSAL)) {
-        sumTotalesApCS += parseInt(r.CUOTA_SOCIAL); 
-        sumTotalesApTT += parseInt(r.TRATAMIENTO); 
-        sumTotalesApCO += parseInt(r.COBRADOR); 
-        sumTotalesApVN += parseInt(r.VENTA_NUEVA); 
-        sumTotalesApMT += parseInt(r.MONTO_TOTAL); 
+      if (arrayAltop.includes(r.SUCURSAL)) {
+        sumTotalesApCS += parseInt(r.CUOTA_SOCIAL);
+        sumTotalesApTT += parseInt(r.TRATAMIENTO);
+        sumTotalesApCO += parseInt(r.COBRADOR);
+        sumTotalesApVN += parseInt(r.VENTA_NUEVA);
+        sumTotalesApMT += parseInt(r.MONTO_TOTAL);
       }
     }
 
     // Suma las cantidades de los turnos
-    for(let t of losTurnosCantidades) {
+    for (let t of losTurnosCantidades) {
       if (arrayAsuncion.includes(t.SUCURSAL)) {
-        sumTotalesAsuncionAG += parseInt(t.AGENDADOS); 
-        sumTotalesAsuncionAS += parseInt(t.ASISTIDOS); 
-        sumTotalesAsuncionPR += parseInt(t.PROFESIONAL); 
+        sumTotalesAsuncionAG += parseInt(t.AGENDADOS);
+        sumTotalesAsuncionAS += parseInt(t.ASISTIDOS);
+        sumTotalesAsuncionPR += parseInt(t.PROFESIONAL);
       }
 
       if (arrayGAsuncion.includes(t.SUCURSAL)) {
-        sumTotalesGAsuncionAG += parseInt(t.AGENDADOS); 
-        sumTotalesGAsuncionAS += parseInt(t.ASISTIDOS); 
-        sumTotalesGAsuncionPR += parseInt(t.PROFESIONAL); 
+        sumTotalesGAsuncionAG += parseInt(t.AGENDADOS);
+        sumTotalesGAsuncionAS += parseInt(t.ASISTIDOS);
+        sumTotalesGAsuncionPR += parseInt(t.PROFESIONAL);
       }
 
       if (arrayRuta2.includes(t.SUCURSAL)) {
-        sumTotalesR2AG += parseInt(t.AGENDADOS); 
-        sumTotalesR2AS += parseInt(t.ASISTIDOS); 
-        sumTotalesR2PR += parseInt(t.PROFESIONAL); 
+        sumTotalesR2AG += parseInt(t.AGENDADOS);
+        sumTotalesR2AS += parseInt(t.ASISTIDOS);
+        sumTotalesR2PR += parseInt(t.PROFESIONAL);
       }
 
       if (arrayItapua.includes(t.SUCURSAL)) {
-        sumTotalesItaAG += parseInt(t.AGENDADOS); 
-        sumTotalesItaAS += parseInt(t.ASISTIDOS); 
-        sumTotalesItaPR += parseInt(t.PROFESIONAL); 
+        sumTotalesItaAG += parseInt(t.AGENDADOS);
+        sumTotalesItaAS += parseInt(t.ASISTIDOS);
+        sumTotalesItaPR += parseInt(t.PROFESIONAL);
       }
 
       if (arrayAltop.includes(t.SUCURSAL)) {
-        sumTotalesApAG += parseInt(t.AGENDADOS); 
-        sumTotalesApAS += parseInt(t.ASISTIDOS); 
-        sumTotalesApPR += parseInt(t.PROFESIONAL); 
+        sumTotalesApAG += parseInt(t.AGENDADOS);
+        sumTotalesApAS += parseInt(t.ASISTIDOS);
+        sumTotalesApPR += parseInt(t.PROFESIONAL);
       }
     }
 
     console.log(sumTotalesAsuncionMT);
-
   }
 
   // Envia los mensajes
@@ -516,7 +544,7 @@ module.exports = (app) => {
       let ejeYlar = 350;
       let ejeYnem = 370;
       let ejeYita = 390;
-      let ejeY1811= 410;
+      let ejeY1811 = 410;
       let ejeYkm14 = 430;
       let ejeYcap = 450;
 
@@ -539,7 +567,6 @@ module.exports = (app) => {
       let ejeYcampo = 690;
 
       let ejeYtotalesAltoP = 710;
-
 
       for (let r of losReportesFormateado) {
         // Zona ASU
@@ -875,7 +902,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYpa);
 
           context.font = "bold 15px Arial";
@@ -1242,7 +1269,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYita);
 
           context.font = "bold 15px Arial";
@@ -1425,7 +1452,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYcap);
 
           context.font = "bold 15px Arial";
@@ -1548,7 +1575,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYcoro);
 
           context.font = "bold 15px Arial";
@@ -1671,7 +1698,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYencar);
 
           context.font = "bold 15px Arial";
@@ -1732,7 +1759,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYmaria);
 
           context.font = "bold 15px Arial";
@@ -1793,7 +1820,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYayo);
 
           context.font = "bold 15px Arial";
@@ -1916,7 +1943,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYsanta);
 
           context.font = "bold 15px Arial";
@@ -1977,7 +2004,7 @@ module.exports = (app) => {
           // Se dibuja los datos del cierre
           context.font = "bold 15px Arial";
           context.fillStyle = "#34495E";
-          context.textAlign = "left";        
+          context.textAlign = "left";
           context.fillText(r.FECHA, ejeXfecha, ejeYcampo);
 
           context.font = "bold 15px Arial";
@@ -2017,366 +2044,521 @@ module.exports = (app) => {
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText('ZONA ASUNCIÓN', ejeXsucu, ejeYtotalesAsu);
+      context.fillText("ZONA ASUNCIÓN", ejeXsucu, ejeYtotalesAsu);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesAsuncionCS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcuota, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionCS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesAsuncionTT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXtrata, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionTT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesAsuncionCO.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcobra, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionCO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesAsuncionVN.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXventa, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionVN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesAsu
+      );
 
       // MONTO TOTAL
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesAsuncionMT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXmonto, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionMT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesAsu
+      );
 
       // AGENDADOS
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesAsuncionAG.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXagendado, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionAG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesAsuncionAS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXasistido, ejeYtotalesAsu);
+      context.fillText(
+        sumTotalesAsuncionAS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesAsuncionPR.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXprofesional, ejeYtotalesAsu);
-
+      context.fillText(
+        sumTotalesAsuncionPR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesAsu
+      );
 
       // SUM - Monto Total ZONA GRAN ASUNCION
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText('ZONA GRAN ASUNCIÓN', ejeXsucu, ejeYtotalesGranAsu);
+      context.fillText("ZONA GRAN ASUNCIÓN", ejeXsucu, ejeYtotalesGranAsu);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesGAsuncionCS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcuota, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionCS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesGranAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesGAsuncionTT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXtrata, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionTT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesGranAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesGAsuncionCO.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcobra, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionCO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesGranAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesGAsuncionVN.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXventa, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionVN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesGranAsu
+      );
 
       // MONTO TOTAL
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesGAsuncionMT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXmonto, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionMT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesGranAsu
+      );
 
       // AGENDADOS
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesGAsuncionAG.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXagendado, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionAG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesGranAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesGAsuncionAS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXasistido, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionAS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesGranAsu
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesGAsuncionPR.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXprofesional, ejeYtotalesGranAsu);
+      context.fillText(
+        sumTotalesGAsuncionPR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesGranAsu
+      );
 
       // SUM - Monto Total ZONA RUTA 2
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText('ZONA RUTA 2', ejeXsucu, ejeYtotalesRuta2);
+      context.fillText("ZONA RUTA 2", ejeXsucu, ejeYtotalesRuta2);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesR2CS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcuota, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2CS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesRuta2
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesR2TT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXtrata, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2TT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesRuta2
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesR2CO.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcobra, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2CO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesRuta2
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesR2VN.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXventa, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2VN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesRuta2
+      );
 
       // MONTO TOTAL
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesR2MT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXmonto, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2MT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesRuta2
+      );
 
       // AGENDADOS
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesR2AG.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXagendado, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2AG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesRuta2
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesR2AS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXasistido, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2AS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesRuta2
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesR2PR.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXprofesional, ejeYtotalesRuta2);
+      context.fillText(
+        sumTotalesR2PR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesRuta2
+      );
 
       // SUM - Monto Total ZONA ITAPUA
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText('ZONA ITAPUA', ejeXsucu, ejeYtotalesItapua);
+      context.fillText("ZONA ITAPUA", ejeXsucu, ejeYtotalesItapua);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesItaCS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcuota, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaCS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesItapua
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesItaTT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXtrata, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaTT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesItapua
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesItaCO.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcobra, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaCO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesItapua
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesItaVN.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXventa, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaVN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesItapua
+      );
 
       // MONTO TOTAL
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesItaMT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXmonto, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaMT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesItapua
+      );
 
       // AGENDADOS
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesItaAG.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXagendado, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaAG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesItapua
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesItaAS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXasistido, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaAS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesItapua
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesItaPR.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXprofesional, ejeYtotalesItapua);
+      context.fillText(
+        sumTotalesItaPR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesItapua
+      );
 
       // SUM - Monto Total ZONA ALTO PARANA
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText('ZONA ALTO PARANA', ejeXsucu, ejeYtotalesAltoP);
+      context.fillText("ZONA ALTO PARANA", ejeXsucu, ejeYtotalesAltoP);
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesApCS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcuota, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApCS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcuota,
+        ejeYtotalesAltoP
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesApTT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXtrata, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApTT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXtrata,
+        ejeYtotalesAltoP
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesApCO.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXcobra, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApCO.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXcobra,
+        ejeYtotalesAltoP
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesApVN.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXventa, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApVN.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXventa,
+        ejeYtotalesAltoP
+      );
 
       // MONTO TOTAL
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "center";
-      context.fillText(sumTotalesApMT.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXmonto, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApMT.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXmonto,
+        ejeYtotalesAltoP
+      );
 
       // AGENDADOS
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesApAG.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXagendado, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApAG.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXagendado,
+        ejeYtotalesAltoP
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesApAS.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXasistido, ejeYtotalesAltoP);
+      context.fillText(
+        sumTotalesApAS.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXasistido,
+        ejeYtotalesAltoP
+      );
 
       context.font = "bold 15px Arial";
       context.fillStyle = "#34495E";
       context.textAlign = "left";
-      context.fillText(sumTotalesApPR.toLocaleString("es", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }), ejeXprofesional, ejeYtotalesAltoP);
-
-
-
-
+      context.fillText(
+        sumTotalesApPR.toLocaleString("es", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }),
+        ejeXprofesional,
+        ejeYtotalesAltoP
+      );
 
       // Escribe la imagen a archivo
       const buffer = canvas.toBuffer("image/png");
