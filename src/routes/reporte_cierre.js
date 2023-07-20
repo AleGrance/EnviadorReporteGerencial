@@ -54,7 +54,6 @@ var tiempoRetrasoEnvios = 15000;
 let numerosDestinatarios = [
   {NOMBRE: 'Ale Corpo', NUMERO: '595974107341'},
   {NOMBRE: 'José Aquino', NUMERO: '595985604619'},
-  {NOMBRE: 'Alejandro Grance', NUMERO: '595986153301'},
   {NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933'},
   ]
 
@@ -511,7 +510,7 @@ module.exports = (app) => {
     }, tiempoRetrasoPGSQL);
   }
 
-  iniciarEnvio();
+  //iniciarEnvio();
 
   function sumarMontos(los_reportes) {
     let arrayAsuncion = [
@@ -701,7 +700,7 @@ module.exports = (app) => {
       context.drawImage(image, 0, 0, width, height);
 
       // Eje X de cada celda - Cierres
-      let ejeXfecha = 120;
+      let ejeXfecha = 125;
       let ejeXsucu = 220;
       let ejeXcuota = 440;
       let ejeXtrata = 570;
