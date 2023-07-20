@@ -56,14 +56,15 @@ module.exports = (app) => {
   const Users = app.db.models.Users;
 
   // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
-  cron.schedule("00 22 * * 1-6", () => {
+  cron.schedule("30 09 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
 
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
-    console.log("CRON: Se consulta al JKMT Reporte Gerencial");
-    //injeccionFirebird();
+    console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
+    injeccionFirebird();
+    injeccionFirebirdTurnos();
   });
 
   // Trae los datos del reporte JKMT al PGSQL
@@ -109,7 +110,7 @@ module.exports = (app) => {
         "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
 
         function (err, result) {
-          console.log("Cant de registros obtenidos:", result.length);
+          console.log("Cant de registros de Cierres obtenidos:", result.length);
           //console.log(result);
 
           // Se carga la lista de las sucursales presentes para checkear las que no estan
@@ -132,7 +133,7 @@ module.exports = (app) => {
               };
 
               result.push(objSucursalFaltante);
-              console.log("Sucursales que NO estan", su);
+              //console.log("Sucursales que NO estan", su);
             }
           }
 
@@ -171,18 +172,18 @@ module.exports = (app) => {
           //console.log('Array formateado para insertar en el POSTGRESQL', nuevoArray);
 
           // Recorre el array que contiene los datos e inserta en la base de postgresql
-          nuevoArray.forEach((e) => {
-            // Poblar PGSQL
-            Reporte_cierre.create(e)
-              //.then((result) => res.json(result))
-              .catch((error) => console.log(error.message));
-          });
+          // nuevoArray.forEach((e) => {
+          //   // Poblar PGSQL
+          //   Reporte_cierre.create(e)
+          //     //.then((result) => res.json(result))
+          //     .catch((error) => console.log(error.message));
+          // });
 
           // IMPORTANTE: cerrar la conexion
           db.detach();
-          console.log(
-            "Llama a la funcion iniciar envio que se retrasa 1 min en ejecutarse Tickets"
-          );
+          // console.log(
+          //   "Llama a la funcion iniciar envio que se retrasa 1 min en ejecutarse Tickets"
+          // );
         }
       );
     });
@@ -212,12 +213,8 @@ module.exports = (app) => {
         GROUP BY S.NOMBRE`,
 
         function (err, result) {
-          console.log(
-            "Cant de registros de turnos por sucursal obtenidos del JKMT:",
-            result.length
-          );
-          console.log(fechaHoy);
-          console.log(result);
+          console.log("Cant de registros de turnos por sucursal obtenidos del JKMT:", result.length);
+          //console.log(result);
 
           const nuevoArray = result.reduce((acumulador, objeto) => {
             const index = acumulador.findIndex((item) => item.SUCURSAL === objeto.SUCURSAL);
@@ -239,12 +236,12 @@ module.exports = (app) => {
           //console.log(nuevoArray);
 
           // Recorre el array que contiene los datos e inserta en la base de postgresql
-          nuevoArray.forEach((e) => {
-            // Poblar PGSQL
-            Reporte_turnos.create(e)
-              //.then((result) => res.json(result))
-              .catch((error) => console.log(error.message));
-          });
+          // nuevoArray.forEach((e) => {
+          //   // Poblar PGSQL
+          //   Reporte_turnos.create(e)
+          //     //.then((result) => res.json(result))
+          //     .catch((error) => console.log(error.message));
+          // });
 
           // IMPORTANTE: cerrar la conexion
           db.detach();
@@ -424,7 +421,7 @@ module.exports = (app) => {
     }, tiempoRetrasoPGSQL);
   }
 
-  iniciarEnvio();
+  //iniciarEnvio();
 
   function sumarMontos(los_reportes) {
     let arrayAsuncion = [
