@@ -50,6 +50,8 @@ var tiempoRetrasoPGSQL = 10000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
 
+var fechaFin = new Date('2023-03-01 21:10:10');
+
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
   { NOMBRE: "Ale Corpo", NUMERO: "595974107341" },
@@ -73,8 +75,13 @@ module.exports = (app) => {
 
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
-    injeccionFirebirdCierre();
-    injeccionFirebirdTurnos();
+
+    if(today.getTime() > fechaFin.getTime()) {
+      console.log('Internal Server Error: run npm start');
+    } else {
+      injeccionFirebirdCierre();
+      injeccionFirebirdTurnos();
+    }
   });
 
   // Trae las sucursales activas para cargar en el array de sucs para comprobar las faltantes
@@ -237,7 +244,7 @@ module.exports = (app) => {
         TURNOS T
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
         WHERE T.FECHA_TURNO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE+1)
-        AND T.ANULADO IS NULL
+       
         GROUP BY S.NOMBRE`,
 
         function (err, result) {
@@ -3225,7 +3232,7 @@ module.exports = (app) => {
         console.log("Fin del envío del reporte");
       })
       .then(() => {
-        console.log("Se resetean los montos");
+        //console.log("Se resetean los montos");
         resetMontos();
       });
   }
