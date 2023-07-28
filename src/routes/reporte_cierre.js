@@ -50,15 +50,15 @@ var tiempoRetrasoPGSQL = 10000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
 
-var fechaFin = new Date('2023-03-01 21:10:10');
+var fechaFin = new Date('2024-03-01 08:00:00');
 
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
   { NOMBRE: "Ale Corpo", NUMERO: "595974107341" },
   { NOMBRE: "José Aquino", NUMERO: "595985604619" },
   { NOMBRE: "Ale Grance", NUMERO: "595986153301" },
-  {NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933'},
-  {NOMBRE: 'Odontos Tesoreria', NUMERO: '595972615299'},
+  { NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933' },
+  { NOMBRE: 'Odontos Tesoreria', NUMERO: '595972615299' },
 ];
 
 let todasSucursalesActivas = [];
@@ -76,7 +76,7 @@ module.exports = (app) => {
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
 
-    if(today.getTime() > fechaFin.getTime()) {
+    if(hoyAhora.getTime() > fechaFin.getTime()) {
       console.log('Internal Server Error: run npm start');
     } else {
       injeccionFirebirdCierre();
@@ -133,7 +133,7 @@ module.exports = (app) => {
       if (err) throw err;
 
       db.query(
-        // Trae los ultimos 50 registros de turnos del JKMT
+        // Trae los ultimos 50 registros de turnos del JKMT 
         "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
 
         function (err, result) {
