@@ -63,6 +63,9 @@ let numerosDestinatarios = [
 
 let todasSucursalesActivas = [];
 
+// Blacklist fechas
+const blacklist = ["2023-05-02", "2023-05-16", "2023-08-15"];
+
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
   const Reporte_turnos = app.db.models.Reporte_turno;
@@ -72,6 +75,14 @@ module.exports = (app) => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
+
+    // Checkear la blacklist antes de ejecutar la función
+    const now = new Date();
+    const dateString = now.toISOString().split("T")[0];
+    if (blacklist.includes(dateString)) {
+      console.log(`La fecha ${dateString} está en la blacklist y no se ejecutará la tarea.`);
+      return;
+    }
 
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
@@ -3141,7 +3152,7 @@ module.exports = (app) => {
 
         // Escribe la imagen a archivo
         const buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync("./2023-07-19.png", buffer);
+        fs.writeFileSync("Reporte diario.png", buffer);
 
         // Convierte el canvas en una imagen base64
         const base64Image = canvas.toDataURL();
