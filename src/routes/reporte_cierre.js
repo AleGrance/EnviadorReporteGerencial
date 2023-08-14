@@ -3153,7 +3153,7 @@ module.exports = (app) => {
         for (let n of numerosDestinatarios) {
           console.log(n);
           mensajeBody = {
-            message: "Buenas tardes, se envia el reporte de cierre diario.",
+            message: "Buenas noches, se envia el reporte de cierre diario.",
             phone: n.NUMERO,
             mimeType: fileMimeTypeMedia,
             data: fileBase64Media,
