@@ -64,7 +64,7 @@ let numerosDestinatarios = [
 let todasSucursalesActivas = [];
 
 // Blacklist fechas
-const blacklist = ["2023-05-02", "2023-05-16", "2023-08-15"];
+const blacklist = ["2023-05-02", "2023-05-16"];
 
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
@@ -675,19 +675,22 @@ module.exports = (app) => {
       sumTotalesGAsuncionAG +
       sumTotalesR2AG +
       sumTotalesItaAG +
-      sumTotalesApAG;
+      sumTotalesApAG +
+      sumTotalesSpAG;
     totalGenAsistido =
       sumTotalesAsuncionAS +
       sumTotalesGAsuncionAS +
       sumTotalesR2AS +
       sumTotalesItaAS +
-      sumTotalesApAS;
+      sumTotalesApAS +
+      sumTotalesSpAS;
     totalGenProfesional =
       sumTotalesAsuncionPR +
       sumTotalesGAsuncionPR +
       sumTotalesR2PR +
       sumTotalesItaPR +
-      sumTotalesApPR;
+      sumTotalesApPR +
+      sumTotalesSpPR;
   }
 
   // Envia los mensajes
