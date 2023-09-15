@@ -59,6 +59,7 @@ let numerosDestinatarios = [
   { NOMBRE: "Ale Grance", NUMERO: "595986153301" },
   { NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933' },
   { NOMBRE: 'Odontos Tesoreria', NUMERO: '595972615299' },
+  { NOMBRE: 'Caja Palma', NUMERO: '595994449887' },
 ];
 
 let todasSucursalesActivas = [];

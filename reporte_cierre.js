@@ -66,6 +66,27 @@ let todasSucursalesActivas = [];
 // Blacklist fechas
 const blacklist = ["2023-05-02", "2023-05-16"];
 
+/**
+ *  PARAMETROS
+ *  PARA EJECUTAR MANUALMENTE
+ *  Y DE UNA FECHA ANTERIOR
+ */
+
+// Fecha del reporte, del registro, y fecha de la primera consulta al JKMT
+let fechaFiltroGlobal = '2023-09-11';
+// para la segunda consulta. la fecha desde y fecha hasta
+let fechaDesde = '2023-09-11 00:00:00'
+let fechaHasta = '2023-09-11 23:59:55' 
+// la que se muestra en la imagen. La primera columna
+let fechaLocalGlobal = '11/09/2023'
+
+/**
+ *  FIN
+ *  PARAMETROS
+ *  PARA EJECUTAR MANUALMENTE
+ *  Y DE UNA FECHA ANTERIOR
+ */
+
 module.exports = (app) => {
   const Reporte_cierre = app.db.models.Reporte_cierre;
   const Reporte_turnos = app.db.models.Reporte_turno;
@@ -139,7 +160,7 @@ module.exports = (app) => {
 
     // La fecha filtro para buscar los registros
     //let fechaHoyFiltro = year + "-" + month + "-" + day;
-    let fechaHoyFiltro = '2023-08-17'
+    let fechaHoyFiltro = fechaFiltroGlobal;
 
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
@@ -147,7 +168,7 @@ module.exports = (app) => {
       db.query(
         // Trae los ultimos 50 registros de turnos del JKMT 
         //"SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
-        "SELECT * FROM XPROC_PANEL_ING_X_CONCEPTO_X_SU('2023-08-17', '2023-08-17')",
+        "SELECT * FROM XPROC_PANEL_ING_X_CONCEPTO_X_SU('" + fechaFiltroGlobal + "', '" + fechaFiltroGlobal + "')",
 
         function (err, result) {
           console.log("Cant de registros de Cierres obtenidos:", result.length);
@@ -242,7 +263,7 @@ module.exports = (app) => {
 
     // La fecha filtro para buscar los registros
     //let fechaHoyFiltro = year + "-" + month + "-" + day;
-    let fechaHoyFiltro = '2023-08-17';
+    let fechaHoyFiltro = fechaFiltroGlobal;
 
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
@@ -257,7 +278,7 @@ module.exports = (app) => {
         FROM
         TURNOS T
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
-        WHERE T.FECHA_TURNO BETWEEN '2023-08-17' AND '2023-08-18'
+        WHERE T.FECHA_TURNO BETWEEN '`+fechaDesde+`' AND '`+fechaHasta+`'
        
         GROUP BY S.NOMBRE`,
 
@@ -422,7 +443,7 @@ module.exports = (app) => {
 
     // La fecha filtro para buscar los registros
     //let fechaHoyFiltro = year + "-" + month + "-" + day;
-    let fechaHoyFiltro = '2023-08-17';
+    let fechaHoyFiltro = fechaFiltroGlobal;
 
     const opcionesFormato = {
       day: "2-digit", // Día del mes con dos dígitos (01, 02, 03, etc.)
@@ -432,7 +453,7 @@ module.exports = (app) => {
 
     // La fecha local para imprimir directamente en el canvas
     //const fechaLocal = fechaHoy.toLocaleDateString(undefined, opcionesFormato);
-    const fechaLocal = '17/08/2023';
+    const fechaLocal = fechaLocalGlobal;
 
     setTimeout(() => {
       // Datos de las cantidades de los turnos
