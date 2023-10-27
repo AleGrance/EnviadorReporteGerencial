@@ -3,6 +3,7 @@ const cron = require("node-cron");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+const moment = require("moment");
 // Para crear la imagen
 const { createCanvas, loadImage } = require("canvas");
 // Conexion con firebird
@@ -50,15 +51,15 @@ var tiempoRetrasoPGSQL = 10000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
 
-var fechaFin = new Date('2024-03-01 08:00:00');
+var fechaFin = new Date("2024-03-01 08:00:00");
 
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
   { NOMBRE: "Ale Corpo", NUMERO: "595974107341" },
   { NOMBRE: "José Aquino", NUMERO: "595985604619" },
   { NOMBRE: "Ale Grance", NUMERO: "595986153301" },
-  { NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933' },
-  { NOMBRE: 'Odontos Tesoreria', NUMERO: '595972615299' },
+  { NOMBRE: "Mirna Quiroga", NUMERO: "595975437933" },
+  { NOMBRE: "Odontos Tesoreria", NUMERO: "595972615299" },
 ];
 
 let todasSucursalesActivas = [];
@@ -73,12 +74,24 @@ const blacklist = ["2023-05-02", "2023-05-16"];
  */
 
 // Fecha del reporte, del registro, y fecha de la primera consulta al JKMT
-let fechaFiltroGlobal = '2023-09-11';
+// let fechaFiltroGlobal = '2023-10-26';
+// // para la segunda consulta. la fecha desde y fecha hasta
+// let fechaDesde = '2023-10-26 00:00:00'
+// let fechaHasta = '2023-10-26 23:59:55'
+// // la que se muestra en la imagen. La primera columna
+// let fechaLocalGlobal = '26/10/2023'
+
+// Para la consulta MANUAL del día de ayer
+const fechaActual = moment();
+const fechaDiaAnterior = fechaActual.subtract(1, "days");
+
+// Fecha del reporte, del registro, y fecha de la primera consulta al JKMT
+let fechaFiltroGlobal = moment(fechaDiaAnterior).format("YYYY-MM-DD");
 // para la segunda consulta. la fecha desde y fecha hasta
-let fechaDesde = '2023-09-11 00:00:00'
-let fechaHasta = '2023-09-11 23:59:55' 
+let fechaDesde = fechaFiltroGlobal + " 00:00:00";
+let fechaHasta = fechaFiltroGlobal + " 23:59:55";
 // la que se muestra en la imagen. La primera columna
-let fechaLocalGlobal = '11/09/2023'
+let fechaLocalGlobal = moment(fechaDiaAnterior).format("DD/MM/YYYY");
 
 /**
  *  FIN
@@ -108,8 +121,8 @@ module.exports = (app) => {
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
 
-    if(hoyAhora.getTime() > fechaFin.getTime()) {
-      console.log('Internal Server Error: run npm start');
+    if (hoyAhora.getTime() > fechaFin.getTime()) {
+      console.log("Internal Server Error: run npm start");
     } else {
       injeccionFirebirdCierre();
       injeccionFirebirdTurnos();
@@ -166,9 +179,13 @@ module.exports = (app) => {
       if (err) throw err;
 
       db.query(
-        // Trae los ultimos 50 registros de turnos del JKMT 
+        // Trae los ultimos 50 registros de turnos del JKMT
         //"SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
-        "SELECT * FROM XPROC_PANEL_ING_X_CONCEPTO_X_SU('" + fechaFiltroGlobal + "', '" + fechaFiltroGlobal + "')",
+        "SELECT * FROM XPROC_PANEL_ING_X_CONCEPTO_X_SU('" +
+          fechaFiltroGlobal +
+          "', '" +
+          fechaFiltroGlobal +
+          "')",
 
         function (err, result) {
           console.log("Cant de registros de Cierres obtenidos:", result.length);
@@ -278,7 +295,11 @@ module.exports = (app) => {
         FROM
         TURNOS T
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
-        WHERE T.FECHA_TURNO BETWEEN '`+fechaDesde+`' AND '`+fechaHasta+`'
+        WHERE T.FECHA_TURNO BETWEEN '` +
+          fechaDesde +
+          `' AND '` +
+          fechaHasta +
+          `'
        
         GROUP BY S.NOMBRE`,
 
