@@ -41,9 +41,9 @@ let fileBase64Media = "";
 let mensajeBody = "";
 
 // URL del WWA Prod - Centos
-//const wwaUrl = "http://192.168.10.200:3004/lead";
+const wwaUrl = "http://192.168.10.200:3004/lead";
 // URL al WWA test
-const wwaUrl = "http://localhost:3001/lead";
+//const wwaUrl = "http://localhost:3001/lead";
 
 // Tiempo de retraso de consulta al PGSQL para iniciar el envio. 1 minuto
 var tiempoRetrasoPGSQL = 10000;
