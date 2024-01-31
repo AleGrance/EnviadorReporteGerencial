@@ -7,6 +7,7 @@ const axios = require("axios");
 const { createCanvas, loadImage } = require("canvas");
 // Conexion con firebird
 var Firebird = require("node-firebird");
+const moment = require("moment");
 
 // Conexion con JKMT
 var odontos = {};
@@ -30,12 +31,8 @@ const canvas = createCanvas(width, height);
 const context = canvas.getContext("2d");
 
 // Logo de odontos
-const imagePath = path.join(__dirname, "..", "assets", "img", "odontos_background.jpeg");
+const imagePath = path.join(__dirname, "..", "img", "odontos_background.jpeg");
 
-// Datos del Mensaje de whatsapp
-let mensajePie = `Se ha registrado su turno! 😁
-Para cualquier consulta, contáctanos escribiendo al WhatsApp del 0214129000
-`;
 let fileMimeTypeMedia = "image/png";
 let fileBase64Media = "";
 let mensajeBody = "";
@@ -43,23 +40,33 @@ let mensajeBody = "";
 // URL del WWA Prod - Centos
 const wwaUrl = "http://192.168.10.200:3004/lead";
 // URL al WWA test
-//const wwaUrl = "http://localhost:3001/lead";
+//const wwaUrl = "http://localhost:3004/lead";
 
 // Tiempo de retraso de consulta al PGSQL para iniciar el envio. 1 minuto
 var tiempoRetrasoPGSQL = 10000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
 
-var fechaFin = new Date('2024-03-01 08:00:00');
+var fechaFin = new Date("2024-03-01 08:00:00");
+
+// Fecha del filtro de busqueda
+let fechaHoyFiltro = "";
+
+// Fecha de impresión
+let fechaLocal = "";
+
+// Para envios por fecha ingresada manualmente
+let fechaManualISO = "2024-01-20";
+let fechaManualLocal = "20/01/2024";
 
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
   { NOMBRE: "Ale Corpo", NUMERO: "595974107341" },
   { NOMBRE: "José Aquino", NUMERO: "595985604619" },
   { NOMBRE: "Ale Grance", NUMERO: "595986153301" },
-  { NOMBRE: 'Mirna Quiroga', NUMERO: '595975437933' },
-  { NOMBRE: 'Odontos Tesoreria', NUMERO: '595972615299' },
-  { NOMBRE: 'Caja Palma', NUMERO: '595994449887' },
+  { NOMBRE: "Mirna Quiroga", NUMERO: "595975437933" },
+  { NOMBRE: "Odontos Tesoreria", NUMERO: "595972615299" },
+  { NOMBRE: "Caja Palma", NUMERO: "595994449887" },
 ];
 
 let todasSucursalesActivas = [];
@@ -72,7 +79,7 @@ module.exports = (app) => {
   const Reporte_turnos = app.db.models.Reporte_turno;
 
   // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
-  cron.schedule("00 22 * * 1-6", () => {
+  cron.schedule("30 22 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
@@ -88,9 +95,10 @@ module.exports = (app) => {
     console.log("Hoy es:", diaHoy, "la hora es:", fullHoraAhora);
     console.log("CRON: Se consulta al JKMT - Cierres y Turnos Reporte Gerencial");
 
-    if(hoyAhora.getTime() > fechaFin.getTime()) {
-      console.log('Internal Server Error: run npm start');
+    if (hoyAhora.getTime() > fechaFin.getTime()) {
+      console.log("Internal Server Error: run npm start");
     } else {
+      getSucursalesActivas();
       injeccionFirebirdCierre();
       injeccionFirebirdTurnos();
     }
@@ -127,26 +135,30 @@ module.exports = (app) => {
     });
   }
 
-  getSucursalesActivas();
+  // Para ejecución manual o testing
+  // getSucursalesActivas();
+  // injeccionFirebirdCierre();
+  // injeccionFirebirdTurnos();
 
   // Trae los datos de los cierres del JKMT al PGSQL
   function injeccionFirebirdCierre() {
     let todasSucursalesReporte = [];
 
-    const fechaHoy = new Date();
-    let year = fechaHoy.getFullYear();
-    let month = fechaHoy.getMonth() + 1;
-    let day = fechaHoy.getDate();
-
     // La fecha filtro para buscar los registros
-    let fechaHoyFiltro = year + "-" + month + "-" + day;
+    fechaHoyFiltro = moment().format('YYYY-MM-DD');
+    
+    // Para ejecucion manual o testing
+    //fechaHoyFiltro = fechaManualISO;
 
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
 
       db.query(
-        // Trae los ultimos 50 registros de turnos del JKMT 
+        // Trae los ultimos 50 registros de turnos del JKMT
         "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
+
+        // Para ejecucion manual
+        //`SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC('${fechaManualISO}', '${fechaManualISO}')`,
 
         function (err, result) {
           console.log("Cant de registros de Cierres obtenidos:", result.length);
@@ -232,14 +244,6 @@ module.exports = (app) => {
   function injeccionFirebirdTurnos() {
     let todasSucursalesReporte = [];
 
-    const fechaHoy = new Date();
-    let year = fechaHoy.getFullYear();
-    let month = fechaHoy.getMonth() + 1;
-    let day = fechaHoy.getDate();
-
-    // La fecha filtro para buscar los registros
-    let fechaHoyFiltro = year + "-" + month + "-" + day;
-
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
 
@@ -256,6 +260,19 @@ module.exports = (app) => {
         WHERE T.FECHA_TURNO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE+1)
        
         GROUP BY S.NOMBRE`,
+
+        // Para ejecucion manual sumar 1 día a la segunda fecha
+        /*`SELECT
+        S.NOMBRE AS SUCURSAL,
+        COUNT (T.COD_TURNO) as AGENDADOS,
+        SUM(T.ASISTIO) AS ASISTIDOS,
+        COUNT (DISTINCT T.COD_PROFESIONAL) AS PROFESIONAL
+        FROM
+        TURNOS T
+        INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
+        WHERE T.FECHA_TURNO BETWEEN ('${fechaManualISO}') AND ('2024-01-21')
+       
+        GROUP BY S.NOMBRE`,*/
 
         function (err, result) {
           console.log(
@@ -408,23 +425,11 @@ module.exports = (app) => {
   let totalGenProfesional = 0;
 
   function iniciarEnvio() {
-    //let fechaHoy = new Date().toISOString().slice(0, 10);
-    const fechaHoy = new Date();
-    let year = fechaHoy.getFullYear();
-    let month = fechaHoy.getMonth() + 1;
-    let day = fechaHoy.getDate();
-
-    // La fecha filtro para buscar los registros
-    let fechaHoyFiltro = year + "-" + month + "-" + day;
-
-    const opcionesFormato = {
-      day: "2-digit", // Día del mes con dos dígitos (01, 02, 03, etc.)
-      month: "2-digit", // Mes con dos dígitos (01, 02, 03, etc.)
-      year: "numeric", // Año con cuatro dígitos (ejemplo: 2023)
-    };
-
     // La fecha local para imprimir directamente en el canvas
-    const fechaLocal = fechaHoy.toLocaleDateString(undefined, opcionesFormato);
+    fechaLocal = moment().format('DD-MM-YYYY');
+
+    // Para ejecucion manual
+    //const fechaLocal = fechaManualLocal;
 
     setTimeout(() => {
       // Datos de las cantidades de los turnos
@@ -3150,7 +3155,7 @@ module.exports = (app) => {
 
         // Escribe la imagen a archivo
         const buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync("Reporte diario.png", buffer);
+        fs.writeFileSync("Reporte - Diario " + fechaLocal + ".png", buffer);
 
         // Convierte el canvas en una imagen base64
         const base64Image = canvas.toDataURL();
@@ -3232,7 +3237,7 @@ module.exports = (app) => {
               }
             })
             .catch((error) => {
-              console.error("Ocurrió un error:", error);
+              console.error("Ocurrió un error:", error.code);
             });
 
           await retraso();
@@ -3317,240 +3322,4 @@ module.exports = (app) => {
     totalGenAsistido = 0;
     totalGenProfesional = 0;
   }
-
-  // Actualizacion de estados de envio - NO SE USA
-  // function updateEstatusERROR(turnoId, cod_error) {
-  //   Se actualiza el estado segun el errors
-  //   const body = {
-  //     estado_envio: cod_error,
-  //   };
-
-  //   Tickets.update(body, {
-  //     where: { id_turno: turnoId },
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(412).json({
-  //         msg: error.message,
-  //       });
-  //     });
-  // }
-
-  /*
-    Metodos
-  */
-
-  // app
-  //   .route("/tickets")
-  //   .get((req, res) => {
-  //     Tickets.findAll({
-  //       order: [["createdAt", "DESC"]],
-  //     })
-  //       .then((result) => res.json(result))
-  //       .catch((error) => {
-  //         res.status(402).json({
-  //           msg: error.menssage,
-  //         });
-  //       });
-  //   })
-  //   .post((req, res) => {
-  //     console.log(req.body);
-  //     Tickets.create(req.body)
-  //       .then((result) => res.json(result))
-  //       .catch((error) => res.json(error));
-  //   });
-
-  // Trae los turnos que tengan en el campo estado_envio = 0
-  // app.route("/ticketsPendientes").get((req, res) => {
-  //   Tickets.findAll({
-  //     where: { estado_envio: 0 },
-  //     order: [["FECHA_CREACION", "ASC"]],
-  //     //limit: 5
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(402).json({
-  //         msg: error.menssage,
-  //       });
-  //     });
-  // });
-
-  // Trae los turnos que ya fueron notificados hoy
-  // app.route("/ticketsNotificados").get((req, res) => {
-  //   // Fecha de hoy 2022-02-30
-  //   let fechaHoy = new Date().toISOString().slice(0, 10);
-
-  //   Tickets.count({
-  //     where: {
-  //       [Op.and]: [
-  //         { estado_envio: 1 },
-  //         {
-  //           updatedAt: {
-  //             [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     //order: [["FECHA_CREACION", "DESC"]],
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(402).json({
-  //         msg: error.menssage,
-  //       });
-  //     });
-  // });
-
-  // Trae la cantidad de turnos enviados por rango de fecha desde hasta
-  // app.route("/ticketsNotificadosFecha").post((req, res) => {
-  //   let fechaHoy = new Date().toISOString().slice(0, 10);
-  //   let { fecha_desde, fecha_hasta } = req.body;
-
-  //   if (fecha_desde === "" && fecha_hasta === "") {
-  //     fecha_desde = fechaHoy;
-  //     fecha_hasta = fechaHoy;
-  //   }
-
-  //   if (fecha_hasta == "") {
-  //     fecha_hasta = fecha_desde;
-  //   }
-
-  //   if (fecha_desde == "") {
-  //     fecha_desde = fecha_hasta;
-  //   }
-
-  //   console.log(req.body);
-
-  //   Tickets.count({
-  //     where: {
-  //       [Op.and]: [
-  //         { estado_envio: 1 },
-  //         {
-  //           updatedAt: {
-  //             [Op.between]: [fecha_desde + " 00:00:00", fecha_hasta + " 23:59:59"],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     //order: [["createdAt", "DESC"]],
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(402).json({
-  //         msg: error.menssage,
-  //       });
-  //     });
-  // });
-
-  // Turnos no enviados - estado_envio 2 o 3
-  // app.route("/ticketsNoNotificados").get((req, res) => {
-  //   // Fecha de hoy 2022-02-30
-  //   let fechaHoy = new Date().toISOString().slice(0, 10);
-  //   Tickets.count({
-  //     where: {
-  //       [Op.and]: [
-  //         { estado_envio: { [Op.in]: [2, 3] } },
-  //         {
-  //           updatedAt: {
-  //             [Op.between]: [fechaHoy + " 00:00:00", fechaHoy + " 23:59:59"],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     //order: [["FECHA_CREACION", "DESC"]],
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(402).json({
-  //         msg: error.menssage,
-  //       });
-  //     });
-  // });
-
-  // // Trae la cantidad de turnos enviados por rango de fecha desde hasta
-  // app.route("/turnosNoNotificadosFecha").post((req, res) => {
-  //   let fechaHoy = new Date().toISOString().slice(0, 10);
-  //   let { fecha_desde, fecha_hasta } = req.body;
-
-  //   if (fecha_desde === "" && fecha_hasta === "") {
-  //     fecha_desde = fechaHoy;
-  //     fecha_hasta = fechaHoy;
-  //   }
-
-  //   if (fecha_hasta == "") {
-  //     fecha_hasta = fecha_desde;
-  //   }
-
-  //   if (fecha_desde == "") {
-  //     fecha_desde = fecha_hasta;
-  //   }
-
-  //   console.log(req.body);
-
-  //   Turnos.count({
-  //     where: {
-  //       [Op.and]: [
-  //         { estado_envio: { [Op.in]: [2, 3] } },
-  //         {
-  //           updatedAt: {
-  //             [Op.between]: [
-  //               fecha_desde + " 00:00:00",
-  //               fecha_hasta + " 23:59:59",
-  //             ],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     //order: [["createdAt", "DESC"]],
-  //   })
-  //     .then((result) => res.json(result))
-  //     .catch((error) => {
-  //       res.status(402).json({
-  //         msg: error.menssage,
-  //       });
-  //     });
-  // });
-
-  // app
-  //   .route("/tickets/:id_turno")
-  //   .get((req, res) => {
-  //     Tickets.findOne({
-  //       where: req.params,
-  //       include: [
-  //         {
-  //           model: Users,
-  //           attributes: ["user_fullname"],
-  //         },
-  //       ],
-  //     })
-  //       .then((result) => res.json(result))
-  //       .catch((error) => {
-  //         res.status(404).json({
-  //           msg: error.message,
-  //         });
-  //       });
-  //   })
-  //   .put((req, res) => {
-  //     Tickets.update(req.body, {
-  //       where: req.params,
-  //     })
-  //       .then((result) => res.json(result))
-  //       .catch((error) => {
-  //         res.status(412).json({
-  //           msg: error.message,
-  //         });
-  //       });
-  //   })
-  //   .delete((req, res) => {
-  //     //const id = req.params.id;
-  //     Tickets.destroy({
-  //       where: req.params,
-  //     })
-  //       .then(() => res.json(req.params))
-  //       .catch((error) => {
-  //         res.status(412).json({
-  //           msg: error.message,
-  //         });
-  //       });
-  //   });
 };
