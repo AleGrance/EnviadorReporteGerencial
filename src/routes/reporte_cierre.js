@@ -3,11 +3,11 @@ const cron = require("node-cron");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+const moment = require("moment");
 // Para crear la imagen
 const { createCanvas, loadImage } = require("canvas");
 // Conexion con firebird
 var Firebird = require("node-firebird");
-const moment = require("moment");
 
 // Conexion con JKMT
 var odontos = {};
@@ -51,13 +51,22 @@ var fechaFin = new Date("2024-03-01 08:00:00");
 
 // Fecha del filtro de busqueda
 let fechaHoyFiltro = "";
-
 // Fecha de impresión
 let fechaLocal = "";
 
-// Para envios por fecha ingresada manualmente
-let fechaManualISO = "2024-01-20";
-let fechaManualLocal = "20/01/2024";
+// MANUAL
+const fechaActual = moment();
+const fechaDiaAnterior = fechaActual.subtract(1, "days");
+
+// Para la consulta MANUAL del día de ayer
+fechaHoyFiltro = fechaDiaAnterior.format("YYYY-MM-DD");
+fechaLocal = fechaDiaAnterior.format("DD-MM-YYYY");
+let fechaSiguienteManualISO = moment().format("YYYY-MM-DD");
+
+// Para la consulta MANUAL por día seleccionado
+// fechaHoyFiltro = "2024-02-10";
+// fechaLocal = "10-02-2024";
+// let fechaSiguienteManualISO = "2024-02-11";
 
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
@@ -79,10 +88,15 @@ module.exports = (app) => {
   const Reporte_turnos = app.db.models.Reporte_turno;
 
   // Ejecutar la funcion a las 22:00 de Lunes(1) a Sabados (6)
-  cron.schedule("30 22 * * 1-6", () => {
+  cron.schedule("00 22 * * 1-6", () => {
     let hoyAhora = new Date();
     let diaHoy = hoyAhora.toString().slice(0, 3);
     let fullHoraAhora = hoyAhora.toString().slice(16, 21);
+
+    // Fechas para las consultas
+    const fechaActual = moment();
+    fechaHoyFiltro = fechaActual.format("YYYY-MM-DD");
+    fechaLocal = fechaActual.format("DD-MM-YYYY");
 
     // Checkear la blacklist antes de ejecutar la función
     const now = new Date();
@@ -135,20 +149,9 @@ module.exports = (app) => {
     });
   }
 
-  // Para ejecución manual o testing
-  // getSucursalesActivas();
-  // injeccionFirebirdCierre();
-  // injeccionFirebirdTurnos();
-
   // Trae los datos de los cierres del JKMT al PGSQL
   function injeccionFirebirdCierre() {
     let todasSucursalesReporte = [];
-
-    // La fecha filtro para buscar los registros
-    fechaHoyFiltro = moment().format('YYYY-MM-DD');
-    
-    // Para ejecucion manual o testing
-    //fechaHoyFiltro = fechaManualISO;
 
     Firebird.attach(odontos, function (err, db) {
       if (err) throw err;
@@ -158,7 +161,7 @@ module.exports = (app) => {
         "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
 
         // Para ejecucion manual
-        //`SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC('${fechaManualISO}', '${fechaManualISO}')`,
+        //`SELECT * FROM PROC_PANEL_ING_X_CNCPT_X_SUC_2('${fechaHoyFiltro}', '${fechaHoyFiltro}')`,
 
         function (err, result) {
           console.log("Cant de registros de Cierres obtenidos:", result.length);
@@ -261,7 +264,7 @@ module.exports = (app) => {
        
         GROUP BY S.NOMBRE`,
 
-        // Para ejecucion manual sumar 1 día a la segunda fecha
+        // Para ejecucion manual
         /*`SELECT
         S.NOMBRE AS SUCURSAL,
         COUNT (T.COD_TURNO) as AGENDADOS,
@@ -270,7 +273,7 @@ module.exports = (app) => {
         FROM
         TURNOS T
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
-        WHERE T.FECHA_TURNO BETWEEN ('${fechaManualISO}') AND ('2024-01-21')
+        WHERE T.FECHA_TURNO BETWEEN ('${fechaHoyFiltro}') AND ('${fechaSiguienteManualISO}')
        
         GROUP BY S.NOMBRE`,*/
 
@@ -349,6 +352,11 @@ module.exports = (app) => {
     });
   }
 
+  // Para ejecución manual o testing
+  // getSucursalesActivas();
+  // injeccionFirebirdCierre();
+  // injeccionFirebirdTurnos();
+
   // Inicia los envios - Consulta al PGSQL
   let losReportes = [];
   let losReportesFormateado = [];
@@ -425,12 +433,6 @@ module.exports = (app) => {
   let totalGenProfesional = 0;
 
   function iniciarEnvio() {
-    // La fecha local para imprimir directamente en el canvas
-    fechaLocal = moment().format('DD-MM-YYYY');
-
-    // Para ejecucion manual
-    //const fechaLocal = fechaManualLocal;
-
     setTimeout(() => {
       // Datos de las cantidades de los turnos
       Reporte_turnos.findAll({
@@ -3155,7 +3157,7 @@ module.exports = (app) => {
 
         // Escribe la imagen a archivo
         const buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync("Reporte - Diario " + fechaLocal + ".png", buffer);
+        fs.writeFileSync("Reporte 1 - Diario " + fechaLocal + ".png", buffer);
 
         // Convierte el canvas en una imagen base64
         const base64Image = canvas.toDataURL();
