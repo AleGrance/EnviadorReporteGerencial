@@ -36,6 +36,11 @@ module.exports = (sequelize, DataType) => {
       allowNull: false,
     },
 
+    ONIX: {
+      type: DataType.STRING,
+      allowNull: false,
+    },
+
     MONTO_TOTAL: {
       type: DataType.STRING,
       allowNull: false,
