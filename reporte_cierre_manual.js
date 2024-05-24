@@ -39,16 +39,16 @@ let fileBase64Media = "";
 let mensajeBody = "";
 
 // URL del WWA Prod - Centos
-const wwaUrl = "http://192.168.10.200:3004/lead";
+//const wwaUrl = "http://192.168.10.200:3004/lead";
 // URL al WWA test
-//const wwaUrl = "http://localhost:3004/lead";
+const wwaUrl = "http://localhost:3004/lead";
 
 // Tiempo de retraso de consulta al PGSQL para iniciar el envio. 1 minuto
 var tiempoRetrasoPGSQL = 5000;
 // Tiempo entre envios. Cada 15s se realiza el envío a la API free WWA
 var tiempoRetrasoEnvios = 15000;
 
-var fechaFin = new Date("2024-07-01 08:00:00");
+var fechaFin = new Date("2024-05-01 08:00:00");
 
 // Fecha del filtro de busqueda
 let fechaHoyFiltro = "";
@@ -70,9 +70,9 @@ const fechaDiaAnterior = fechaActual.subtract(1, "days");
 // let fechaSiguienteManualISO = "2024-02-01";
 
 // Para la consulta usan la VARIABLE DE ENTORNO .env
-// fechaHoyFiltro = process.env.fechaHoyFiltro;
-// fechaLocal = process.env.fechaLocal;
-// let fechaSiguienteManualISO = process.env.fechaSiguienteManualISO;
+fechaHoyFiltro = process.env.fechaHoyFiltro;
+fechaLocal = process.env.fechaLocal;
+let fechaSiguienteManualISO = process.env.fechaSiguienteManualISO;
 
 // Destinatarios a quien enviar el reporte
 let numerosDestinatarios = [
@@ -164,10 +164,10 @@ module.exports = (app) => {
 
       db.query(
         // Trae los ultimos 50 registros de turnos del JKMT
-        "SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
+        //"SELECT * FROM PROC_PANEL_ING_X_CONCEPTO_X_SUC(CURRENT_DATE, CURRENT_DATE)",
 
         // Para ejecucion MANUAL
-        //`SELECT * FROM PROC_PANEL_ING_X_CNCPT_X_SUC_2('${fechaHoyFiltro}', '${fechaHoyFiltro}')`,
+        `SELECT * FROM PROC_PANEL_ING_X_CNCPT_X_SUC_2('${fechaHoyFiltro}', '${fechaHoyFiltro}')`,
 
         function (err, result) {
           console.log("Cant de registros de Cierres obtenidos:", result.length);
@@ -264,7 +264,7 @@ module.exports = (app) => {
 
       db.query(
         // Trae las cantidades de turnos por sucursal del JKMT
-        `SELECT
+        /*`SELECT
         S.NOMBRE AS SUCURSAL,
         COUNT (T.COD_TURNO) as AGENDADOS,
         SUM(T.ASISTIO) AS ASISTIDOS,
@@ -274,10 +274,10 @@ module.exports = (app) => {
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
         WHERE T.FECHA_TURNO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE+1)
        
-        GROUP BY S.NOMBRE`,
+        GROUP BY S.NOMBRE`,*/
 
         // Para ejecucion MANUAL
-        /*`SELECT
+        `SELECT
         S.NOMBRE AS SUCURSAL,
         COUNT (T.COD_TURNO) as AGENDADOS,
         SUM(T.ASISTIO) AS ASISTIDOS,
@@ -287,7 +287,7 @@ module.exports = (app) => {
         INNER JOIN SUCURSALES S ON T.COD_SUCURSAL = S.COD_SUCURSAL
         WHERE T.FECHA_TURNO BETWEEN ('${fechaHoyFiltro}') AND ('${fechaSiguienteManualISO}')
        
-        GROUP BY S.NOMBRE`,*/
+        GROUP BY S.NOMBRE`,
 
         function (err, result) {
           console.log(
@@ -365,9 +365,9 @@ module.exports = (app) => {
   }
 
   // Para ejecución MANUAL
-  // getSucursalesActivas();
-  // injeccionFirebirdCierre();
-  // injeccionFirebirdTurnos();
+  getSucursalesActivas();
+  injeccionFirebirdCierre();
+  injeccionFirebirdTurnos();
 
   // Inicia los envios - Consulta al PGSQL
   let losReportes = [];
